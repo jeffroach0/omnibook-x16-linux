@@ -1,0 +1,24 @@
+#!/bin/sh
+# systemd-sleep hook for the HP OmniBook X16 device-tree test boot.
+# Does nothing in normal (ACPI) mode.
+# pre:  use s2idle (firmware refuses deep: PSCI SYSTEM_SUSPEND -> -EOPNOTSUPP),
+#       stop the Wi-Fi PCIe WAKE# (gpio148) from waking us,
+#       unbind the webcam USB controller (usb_hs dies on resume otherwise).
+# post: bind the webcam controller again.
+
+grep -aqs 'HP OmniBook X Laptop 16' /proc/device-tree/model || exit 0
+
+WIFI_RP=/sys/bus/pci/devices/0004:00:00.0/power/wakeup
+DWC=/sys/bus/platform/drivers/dwc3-qcom
+
+case "$1" in
+pre)
+	echo s2idle > /sys/power/mem_sleep 2>/dev/null
+	[ -w "$WIFI_RP" ] && echo disabled > "$WIFI_RP"
+	[ -e "$DWC/a200000.usb" ] && echo a200000.usb > "$DWC/unbind"
+	;;
+post)
+	[ -e "$DWC/a200000.usb" ] || echo a200000.usb > "$DWC/bind"
+	;;
+esac
+exit 0

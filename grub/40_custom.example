@@ -1,0 +1,16 @@
+# Example test entry for /etc/grub.d/40_custom (append below the existing lines).
+# Replace <ROOT-UUID> with your root filesystem UUID (see `findmnt -no UUID /`)
+# and the kernel version with yours. Boot it ONCE with:
+#   sudo update-grub
+#   sudo grub-reboot 'Ubuntu - DT TEST omnibook-x16'
+#   sudo reboot
+# A normal reboot afterwards goes back to the standard (ACPI) entry.
+
+menuentry 'Ubuntu - DT TEST omnibook-x16' {
+    insmod part_gpt
+    insmod ext2
+    search --no-floppy --fs-uuid --set=root <ROOT-UUID>
+    linux /boot/vmlinuz-7.3.0-21-qcom-x1e root=UUID=<ROOT-UUID> ro clk_ignore_unused pd_ignore_unused ignore_loglevel stubble.dtb_override=false
+    initrd /boot/dtb-test/initrd.img-7.3.0-21-qcom-x1e-dt-test
+    devicetree /boot/dtb-test/mahua-hp-omnibook-x16.dtb
+}

@@ -1,0 +1,1 @@
+obj-m += pwrseq-pcie-m2.o
