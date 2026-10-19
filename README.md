@@ -144,9 +144,12 @@ an initramfs that contains them. Details: [bluetooth/README.md](bluetooth/README
   `mahua-crd.dts`/`mahua.dtsi`, by the Linux kernel arm64/Qualcomm contributors.
 - QCC2072 Bluetooth patches (series "rb3-industrial-bt-uart" v2, July 2026): Vivek Sahu, Yepuri Siddu,
   Rahul Samana and Krishna Chaitanya Chundru (Qualcomm), as posted to the kernel mailing lists.
-- Developed with the help of Claude (Anthropic).
+- Investigation, device tree, fixes and write-up: Jeff R together with **Claude Opus 5.5** (Anthropic), working
+  in Claude Code. Claude analysed ACPI tables, kernel source and boot logs and drafted the DT and fixes; Jeff ran
+  every test boot on the real hardware and confirmed the results.
 
 ## Licence
 
 - `dts/`: BSD-3-Clause (as in its SPDX header, like the upstream files it is based on).
 - `bluetooth/`: kernel patches, GPL-2.0.
+- Everything else (scripts, config files, documentation): MIT, see [LICENSE](LICENSE).
