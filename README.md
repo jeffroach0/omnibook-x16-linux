@@ -45,6 +45,7 @@ hardware does not work. With this DT, nearly everything does.
 | `suspend/omnibook-x16-dt` | systemd sleep hook that makes suspend work |
 | `grub/40_custom.example` | Example one-shot GRUB test entry |
 | `docs/findings.md` | What was found and how each problem was fixed |
+| `docs/linux-arm-msm-post-2026-10-21.txt` | Bring-up report and questions sent to the linux-arm-msm mailing list (Oct 21, 2026) |
 | `CONTRIBUTORS.md` | Who did the work |
 
 ## Tested setup

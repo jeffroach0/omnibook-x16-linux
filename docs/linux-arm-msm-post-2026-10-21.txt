@@ -1,0 +1,90 @@
+To: linux-arm-msm@vger.kernel.org
+Cc: Bjorn Andersson <andersson@kernel.org>,
+    Konrad Dybcio <konradybcio@kernel.org>,
+    Rob Clark <robin.clark@oss.qualcomm.com>,
+    Akhil P Oommen <akhilpo@oss.qualcomm.com>
+Subject: HP OmniBook X 16 (X2 Elite, Mahua): DT bring-up report and questions
+
+Hi all,
+
+I have a device tree for the HP OmniBook X Laptop 16-cp1xxx (board
+8F46, Snapdragon X2 Elite 12-core, "qcom,mahua") that boots and runs a
+full desktop. This is a bring-up report, not a patch: the DTS is
+currently based on the Ubuntu linux-qcom-x1e 7.3 tree and still
+carries my verification notes. I'd like to rebase it and send it
+properly, and would welcome advice before I do.
+
+The DTS sits on mahua.dtsi, uses the same PMIC deletions as
+mahua-crd.dts, and copies board wiring from
+glymur-hp-elitebook-x-g2q.dts. I checked it against this laptop's ACPI
+tables where I could. DTS, notes and test results:
+
+  https://github.com/jeffroach0/omnibook-x16-linux
+
+Disclosure: I'm not a kernel developer. Most of the analysis and the
+DTS were done with an AI coding assistant (Claude); I did the testing
+on the hardware and checked the results. I'll do my best to answer
+questions and test things, but please be patient with me.
+
+Working (kernel 7.3.0-21-qcom-x1e, Mesa 26.2.4):
+- eDP OLED panel via msm (samsung,atna33xc20), DP-AUX backlight
+- GPU (Adreno X2-85), with the workaround in (1) below
+- Keyboard and touchpad (i2c-hid), lid, power key
+- NVMe on pcie5; Wi-Fi QCC2072 on pcie4 (ath12k, modelled as a
+  pcie-m2-e-connector)
+- Bluetooth QCC2072 on uart14, using the posted QCC2072 UART series
+  (btqca/hci_qca and pwrseq-pcie-m2 patches) built out of tree
+- usb_0/usb_1 Type-C (SuperSpeed in both orientations, PD charging
+  through pmic-glink), usb_2 USB-A (no repeater node needed, UEFI leaves
+  it set up), usb_hs (webcam)
+- ADSP/CDSP with OEM firmware from the Windows install; battery through
+  qcom_battmgr
+- 2x WSA884x speakers on swr0 plus VA DMICs
+- s2idle suspend
+
+Issues and questions:
+
+1. GPU GMEM size on 3-slice Mahua. MSM_PARAM_GMEM_SIZE reports the
+   catalog's full (4-slice) GMEM, so Mesa's tiled rendering corrupts
+   the screen (garbage bands, diagonal half-drawn quads, and CCU write
+   translation faults from WebKit's Skia GPU raster). FD_MESA_DEBUG=sysmem
+   and TU_DEBUG=sysmem make it clean. I think the a8xx slice-info change
+   in linux-next ("report the active share" of GMEM) fixes this. Is it
+   going to be backported to stable?
+
+2. CPU frequency. scmi_cpufreq fails: "timed out in resp" and "Failed
+   to query supported version for protocol 0x13", probe -110. The SCMI
+   base protocol answers at boot ("Qualcomm:PDP0"). The perf
+   protocol never does. The clocks stay where UEFI left them (about 3.5
+   and 3.9 GHz). Is perf over SCMI expected to work on Mahua with
+   production firmware, or is something else needed?
+
+3. Suspend. PSCI SYSTEM_SUSPEND (deep) returns -EOPNOTSUPP, so s2idle
+   only. On resume from s2idle, usb_hs (a200000) gets an arm-smmu context
+   fault for SID 0xce0, then "xHCI host not responding ... HC died", and
+   every later suspend fails until reboot. Unbinding dwc3-qcom before
+   suspend and rebinding it after works around it. pcie4 also logs
+   "Timeout waiting for L2 entry! LTSSM 0x11" on suspend, but the link
+   recovers.
+
+4. Smaller things:
+   - "GICv3: SPI 4115 out of range (use ESPI?)" right after the SPMI
+     arbiter probes. I haven't tracked down which node causes it.
+   - The pm8xxx RTC probe fails with -ENOENT because this machine has no
+     RTCInfo UEFI variable (qcom,uefi-rtc-info).
+   - The headphone jack is a Qualcomm SoundWire SDCA codec (only in ACPI,
+     \_SB.ADSP.ADCM). I didn't try it.
+
+For an upstream submission I assume the right base is the qcom
+for-next tree, with a dt-bindings patch for "hp,omnibook-x16". Please
+tell me if anything in the approach above (for example the /chosen
+simple-framebuffer that keeps MMCX/MXC on before msm probes, or
+dropping usb-role-switch while running host-only) shouldn't go
+upstream as it is.
+
+I'm happy to test patches and other things mentioned in this post on
+this machine to the best of my and Claude's ability (mine being fairly
+meager).
+
+Thanks,
+Jeff
