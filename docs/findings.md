@@ -41,6 +41,14 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
   `WEBKIT_SKIA_ENABLE_CPU_RENDERING=1` fixes it.
 - Chrome's default ANGLE-on-OpenGL path faulted the GPU even with `sysmem`. ANGLE on Vulkan works.
 
+## Touchscreen
+
+- ACPI device TSC1 (ELAN2513) is enabled on this board (its `_STA` checks `\_SB.SKID`, which is 1). Its `_CRS`,
+  decoded by hand, gives I2C9 (QUP_1_SE_0, base `0x00a80000` = DT `i2c8`), address 0x10, 400 kHz, HID descriptor
+  address 1, and a level, active-low interrupt on GPIO 51. That matches the EliteBook X G2q donor node exactly.
+- With `&i2c8` enabled and a `hid-over-i2c` node, the panel probes as `04F3:44BF` (hid-multitouch) and touch works.
+  It needs no supply in the DT ("using dummy regulator" is harmless).
+
 ## USB
 
 - USB-C (`usb_0` left back, `usb_1` left front): host mode with the smb2370 eUSB2 repeaters (DONOR) worked at once.

@@ -49,6 +49,7 @@
 	aliases {
 		i2c0 = &i2c0;
 		i2c4 = &i2c4;
+		i2c8 = &i2c8;
 
 		serial1 = &uart14;	/* DONOR; geni UART refuses to probe without an alias */
 	};
@@ -576,6 +577,32 @@
 	};
 };
 
+/*
+ * Touchscreen (stage 14): ACPI TSC1 = ELAN2513 on I2C9 (QUP_1_SE_0, base
+ * 0x00a80000 = i2c8), address 0x10, 400 kHz, HID descriptor address 1,
+ * GpioInt pin 51 level active-low. VERIFIED from this laptop's DSDT (decoded
+ * by hand); TSC1 _STA is on because \_SB.SKID = 1. Matches the donor node
+ * exactly. VERIFIED Oct 21: ELAN 04F3:44BF probes on 8-0010 and touch works.
+ */
+&i2c8 {
+	clock-frequency = <400000>;
+
+	status = "okay";
+
+	touchscreen@10 {
+		compatible = "hid-over-i2c";
+		reg = <0x10>;
+
+		hid-descr-addr = <0x1>;
+		interrupts-extended = <&tlmm 51 IRQ_TYPE_LEVEL_LOW>;
+
+		post-power-on-delay-ms = <200>;	/* DONOR */
+
+		pinctrl-0 = <&ts0_default>;
+		pinctrl-names = "default";
+	};
+};
+
 /* Built-in digital mics on DMIC0/1 (DONOR) */
 &lpass_vamacro {
 	vdd-micb-supply = <&vreg_l1b_e0_1p8>;
@@ -750,6 +777,13 @@
 
 	tpad_default: tpad-default-state {
 		pins = "gpio3";
+		function = "gpio";
+		bias-disable;
+	};
+
+	/* ACPI asks for PullUp on this pin; the donor uses bias-disable */
+	ts0_default: ts0-default-state {
+		pins = "gpio51";
 		function = "gpio";
 		bias-disable;
 	};

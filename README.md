@@ -18,6 +18,7 @@ hardware does not work. With this DT, nearly everything does.
 | Brightness (keys + slider) | ✅ | DP-AUX backlight |
 | GPU (Adreno X2-85, hardware rendering) | ⚠️ works with a workaround | see [GPU](#gpu) |
 | Keyboard, touchpad, lid switch, power key | ✅ | |
+| Touchscreen (ELAN, I2C) | ✅ | `i2c8`, address 0x10, interrupt GPIO 51 (from the DSDT) |
 | Wi-Fi (Qualcomm QCC2072, Wi-Fi 7) | ✅ | needs a board file from Windows, see [Wi-Fi](#wi-fi) |
 | Bluetooth (QCC2072) | ⚠️ works with patched modules | not in kernel 7.3, see [Bluetooth](#bluetooth) |
 | USB-C ports (both, left side): USB 3, charging, plug orientation | ✅ | via pmic-glink |
