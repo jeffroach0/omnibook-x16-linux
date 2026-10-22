@@ -62,7 +62,7 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
   2 lanes at HBR is enough for 1080p60, not for 1440p60 or 4K60.
 - Likely cause (not yet proven by a patched driver): `qmp_v8_configure_dp_clocks()` in `phy-qcom-qmp-combo.c` uses a
   VCO divider of 0x4 for 5.4 Gbps (0x2 for 2.7 Gbps). The Glymur eDP PHY driver (`phy-qcom-edp.c`) uses 0x2 for
-  5.4 Gbps, and the internal eDP panel works at that rate. 8.1 Gbps may be affected too (0x3 vs 0x1); untested.
+  5.4 Gbps and 0x1 for 8.1 Gbps (combo PHY: 0x3). 8.1 Gbps is untested.
 
 ## USB
 
