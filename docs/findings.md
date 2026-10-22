@@ -49,6 +49,21 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
 - With `&i2c8` enabled and a `hid-over-i2c` node, the panel probes as `04F3:44BF` (hid-multitouch) and touch works.
   It needs no supply in the DT ("using dummy regulator" is harmless).
 
+## DisplayPort over USB-C
+
+- `mdss_dp0` (left back port) and `mdss_dp1` (left front port) enabled as in the EliteBook X G2q donor. `glymur.dtsi`
+  already connects them to the USB-C QMP PHYs, and pmic-glink (already present for USB) reports hot-plug.
+- Tested with a USB-C hub with an HDMI output (Parade PS176 DP-to-HDMI converter) and a 1080p monitor. The same
+  hub and monitor work in Windows. Picture tested on the back port; the front port detects the monitor too.
+- At the default link rates, Linux picked HBR2 (5.4 Gbps) on 2 lanes. AUX, EDID and link training all succeeded,
+  but the monitor said "No signal". Timing the vblank interrupts showed the DP stream running at **exactly 30 Hz**
+  for a 60 Hz mode, so the display timing ran at half the pixel clock the stream header promised.
+- *Workaround:* cap `link-frequencies` at HBR (2.7 Gbps). Then the stream runs at 60.000 Hz and the picture is fine.
+  2 lanes at HBR is enough for 1080p60, not for 1440p60 or 4K60.
+- Likely cause (not yet proven by a patched driver): `qmp_v8_configure_dp_clocks()` in `phy-qcom-qmp-combo.c` uses a
+  VCO divider of 0x4 for 5.4 Gbps (0x2 for 2.7 Gbps). The Glymur eDP PHY driver (`phy-qcom-edp.c`) uses 0x2 for
+  5.4 Gbps, and the internal eDP panel works at that rate. 8.1 Gbps may be affected too (0x3 vs 0x1); untested.
+
 ## USB
 
 - USB-C (`usb_0` left back, `usb_1` left front): host mode with the smb2370 eUSB2 repeaters (DONOR) worked at once.
@@ -109,7 +124,7 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
 - **RTC:** `rtc-pm8xxx` reads its offset from the UEFI variable `RTCInfo`, which this laptop does not have, so
   probe fails with -2. The time is fine once NTP syncs.
 - **Headphone jack:** no Linux driver for the Qualcomm SDCA codec.
-- **DisplayPort over USB-C:** not tried yet (`mdss_dp0` / `mdss_dp1`).
+- **DisplayPort over USB-C above HBR:** see [DisplayPort over USB-C](#displayport-over-usb-c).
 - Minor: `GICv3: SPI 4115 out of range`. Also, the debug UART (`894000.serial`) has no alias. Adding one would let
   interconnect `sync_state()` run and drop bandwidth votes that simpledrm relies on, so it was left alone.
 

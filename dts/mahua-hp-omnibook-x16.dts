@@ -470,7 +470,7 @@
  * dispcc is enabled again (it is on by default in glymur.dtsi; stages 1-10
  * had it disabled). The /chosen simple-framebuffer stays as a fallback:
  * msm removes it when it takes over, simpledrm keeps working if msm fails.
- * Only eDP: USB-C DisplayPort (mdss_dp0/dp1) is left out for now.
+ * USB-C DisplayPort (mdss_dp0/dp1) is added in stage 15 (below &mdss_dp3_phy).
  *
  * Panel: SDC 0x4214 OLED 1920x1200 (VERIFIED from Windows WmiMonitorID).
  * "samsung,atna33xc20" is the generic driver for Samsung OLED eDP panels
@@ -517,6 +517,36 @@
 	vdda-pll-supply = <&vreg_l4f_e1_1p2>;
 
 	status = "okay";
+};
+
+/*
+ * Stage 15: DisplayPort alt mode on the two USB-C ports. DONOR (EliteBook X
+ * G2q): glymur.dtsi already wires mdss_dp0 -> usb_0_qmpphy (left back) and
+ * mdss_dp1 -> usb_1_qmpphy (left front); pmic_glink_altmode reports HPD and
+ * the pin assignment through the connectors. Link rates DONOR. Whether HP
+ * wired DP to these ports is not checked from ACPI. Back port: 1080p60 picture
+ * through a USB-C hub with HDMI output (VERIFIED). Front port: hot-plug detected,
+ * picture not tested yet.
+ * At HBR2 (5.4 Gbps) link training passed but the stream ran at exactly 30 Hz
+ * instead of 60 (measured vblanks) -> no picture. Capped at HBR (2.7 Gbps): 60 Hz,
+ * picture OK (VERIFIED). Likely cause: the QMP v8 VCO_DIV value for 5400 in
+ * phy-qcom-qmp-combo.c (0x4; the Glymur eDP PHY uses 0x2). Remove the cap once
+ * that is fixed. With the cap: 2 lanes x HBR, enough for 1080p60, not 1440p60/4K60.
+ */
+&mdss_dp0 {
+	status = "okay";
+};
+
+&mdss_dp0_out {
+	link-frequencies = /bits/ 64 <1620000000 2700000000>; /* HBR max: HBR2 runs at half rate, see above */
+};
+
+&mdss_dp1 {
+	status = "okay";
+};
+
+&mdss_dp1_out {
+	link-frequencies = /bits/ 64 <1620000000 2700000000>; /* HBR max: HBR2 runs at half rate, see above */
 };
 
 /*
@@ -1026,7 +1056,6 @@
 
 /*
  * Deliberately NOT enabled yet (see the donor for the wiring):
- *   mdss_dp0/dp1   -> DisplayPort over USB-C (eDP panel is enabled, stage 11)
  *   gpu/gmu        -> needs firmware extracted from Windows
  *   remoteproc_soccp -> already running from UEFI (attached), left alone
  *   bluetooth      -> uart14 + wlan-connector port@3, later
