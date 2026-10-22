@@ -54,7 +54,7 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
 - `mdss_dp0` (left back port) and `mdss_dp1` (left front port) enabled as in the EliteBook X G2q donor. `glymur.dtsi`
   already connects them to the USB-C QMP PHYs, and pmic-glink (already present for USB) reports hot-plug.
 - Tested with a USB-C hub with an HDMI output (Parade PS176 DP-to-HDMI converter) and a 1080p monitor. The same
-  hub and monitor work in Windows. Picture tested on the back port; the front port detects the monitor too.
+  hub and monitor work in Windows. Both ports give a picture.
 - At the default link rates, Linux picked HBR2 (5.4 Gbps) on 2 lanes. AUX, EDID and link training all succeeded,
   but the monitor said "No signal". Timing the vblank interrupts showed the DP stream running at **exactly 30 Hz**
   for a 60 Hz mode, so the display timing ran at half the pixel clock the stream header promised.

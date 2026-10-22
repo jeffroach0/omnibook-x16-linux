@@ -30,7 +30,7 @@ hardware does not work. With this DT, nearly everything does.
 | Audio DSP / compute DSP (ADSP, CDSP) | ✅ | firmware from Windows |
 | Suspend (s2idle) | ✅ with a sleep hook | deep sleep is refused by the firmware |
 | Headphone jack | ❌ | Qualcomm SoundWire SDCA codec, no Linux driver |
-| DisplayPort over USB-C | ✅ up to 1080p60 | tested on the back port; link speed capped at HBR: at HBR2 the picture runs at half rate (likely a PHY driver bug), see [findings](docs/findings.md#displayport-over-usb-c) |
+| DisplayPort over USB-C | ✅ up to 1080p60 | both ports; link speed capped at HBR: at HBR2 the picture runs at half rate (likely a PHY driver bug), see [findings](docs/findings.md#displayport-over-usb-c) |
 | CPU frequency scaling | ❌ | firmware does not answer SCMI performance requests; CPUs stay at the clock UEFI set (~3.5 / 3.9 GHz) |
 | Real-time clock | ❌ | the PMIC RTC needs a UEFI variable (`RTCInfo`) that this laptop does not have. The time is correct once NTP syncs. |
 

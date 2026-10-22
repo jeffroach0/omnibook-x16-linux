@@ -524,9 +524,8 @@
  * G2q): glymur.dtsi already wires mdss_dp0 -> usb_0_qmpphy (left back) and
  * mdss_dp1 -> usb_1_qmpphy (left front); pmic_glink_altmode reports HPD and
  * the pin assignment through the connectors. Link rates DONOR. Whether HP
- * wired DP to these ports is not checked from ACPI. Back port: 1080p60 picture
- * through a USB-C hub with HDMI output (VERIFIED). Front port: hot-plug detected,
- * picture not tested yet.
+ * wired DP to these ports is not checked from ACPI, but both ports give a 1080p60
+ * picture through a USB-C hub with HDMI output (VERIFIED).
  * At HBR2 (5.4 Gbps) link training passed but the stream ran at exactly 30 Hz
  * instead of 60 (measured vblanks) -> no picture. Capped at HBR (2.7 Gbps): 60 Hz,
  * picture OK (VERIFIED). Likely cause: the QMP v8 VCO_DIV value for 5400 in
