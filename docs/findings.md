@@ -40,6 +40,14 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
 - WebKitGTK's GPU raster (Skia) still caused real GPU page faults and hangs.
   `WEBKIT_SKIA_ENABLE_CPU_RENDERING=1` fixes it.
 - Chrome's default ANGLE-on-OpenGL path faulted the GPU even with `sysmem`. ANGLE on Vulkan works.
+- *Fix (Oct 22):* on linux-arm-msm, Akhil P Oommen pointed to the series "drm/msm: Mahua GPU support" v1.
+  It gives Mahua its own catalog entry (chip ID 0x44060000, GMEM 15.75 MB = 3/4 of Glymur's). Patch 3 (driver)
+  and patch 5 (`mahua.dtsi`) were applied, with `msm.ko` built out of tree. The driver then reports
+  GMEM_SIZE 0xfc0000. Released Mesa (up to 26.2.5) does not know chip ID 0x44060030, so a local shim reports it
+  as Glymur's 3-slice X2-85 (0x44070031), which Mesa main treats identically.
+  Result: gnome-shell, turnip (Ptyxis) and WebKitGTK GPU raster (GNOME Help) render cleanly with none of the
+  workaround variables, and the kernel log shows no GPU faults. Before the patch the same WebKit test caused
+  GPU page faults and hangs. Still clean after a longer session of normal use (all windows, no anomalies).
 
 ## Touchscreen
 
@@ -122,7 +130,9 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   timeout, -110), even when loaded early. ACPI has no CPU performance control either. The CPUs run at the clock
   UEFI set.
 - **RTC:** `rtc-pm8xxx` reads its offset from the UEFI variable `RTCInfo`, which this laptop does not have, so
-  probe fails with -2. The time is fine once NTP syncs.
+  probe failed with -2. Without `qcom,uefi-rtc-info` (Konrad Dybcio's suggestion) the driver probes and `rtc0`
+  is read-only, but it reads the raw PMIC counter (~190 days after 1970 on this laptop), not the real time.
+  Where Windows keeps the real offset is unknown. The time is fine once NTP syncs.
 - **Headphone jack:** no Linux driver for the Qualcomm SDCA codec.
 - **DisplayPort over USB-C above HBR:** see [DisplayPort over USB-C](#displayport-over-usb-c).
 - Minor: `GICv3: SPI 4115 out of range`. Also, the debug UART (`894000.serial`) has no alias. Adding one would let

@@ -555,10 +555,13 @@
  * typing blind at the tty1 login prompt produced login attempts in auth.log.
  */
 /*
- * GPU/GMU: left enabled (glymur.dtsi has no status). Boot 19 showed screen corruption with
- * hardware rendering; cause = kernel reports the full 4-slice GMEM, Mahua has 3 slices.
- * VERIFIED workaround (boot 22): /etc/environment FD_MESA_DEBUG=sysmem,noubwc and
- * TU_DEBUG=sysmem,noubwc. Without those lines, add status = "disabled" to &gmu and &gpu.
+ * GPU/GMU: left enabled (glymur.dtsi has no status). With the stock 7.3 kernel the
+ * screen is corrupted under hardware rendering: msm reports the full 4-slice GMEM, but
+ * Mahua's X2-85 has 3 slices. FIX VERIFIED (Oct 22): "drm/msm: Mahua GPU support" v1.
+ * Patch 5 goes into mahua.dtsi (gpu "qcom,adreno-44060000", gmu "qcom,adreno-gmu-x285.0")
+ * and REQUIRES a msm.ko with patch 3 (catalog entry 0x44060000, 15.75 MB GMEM); with the
+ * stock msm.ko that DTB has no GPU. Without either patch, the Mesa workaround (FD_MESA_DEBUG/
+ * TU_DEBUG=sysmem, VERIFIED boot 22) avoids the corruption. See gpu/ in the repo.
  */
 
 &i2c0 {
@@ -695,7 +698,13 @@
 
 &pmk8850_rtc {
 	qcom,no-alarm;
-	qcom,uefi-rtc-info;
+	/*
+	 * No qcom,uefi-rtc-info: this machine has no RTCInfo UEFI variable, so the
+	 * driver failed with -ENOENT. Without it rtc0 registers read-only with
+	 * offset 0 (suggested by Konrad Dybcio on linux-arm-msm, Oct 22 2026).
+	 * VERIFIED Oct 22: probes, but reads the raw PMIC counter (~1970), not
+	 * real time. NTP still sets the clock.
+	 */
 };
 
 /* DONOR: eUSB2 repeaters for USB-C ports 0 and 1 */

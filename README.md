@@ -16,7 +16,7 @@ hardware does not work. With this DT, nearly everything does.
 | NVMe SSD, boot to desktop | ✅ | |
 | Internal display (16" Samsung OLED, eDP) | ✅ | msm DRM driver, `samsung,atna33xc20` panel |
 | Brightness (keys + slider) | ✅ | DP-AUX backlight |
-| GPU (Adreno X2-85, hardware rendering) | ⚠️ works with a workaround | see [GPU](#gpu) |
+| GPU (Adreno X2-85, hardware rendering) | ✅ with patches | needs a patched `msm.ko` (Qualcomm's Mahua GPU series), or a Mesa workaround; see [GPU](#gpu) |
 | Keyboard, touchpad, lid switch, power key | ✅ | |
 | Touchscreen (ELAN, I2C) | ✅ | `i2c8`, address 0x10, interrupt GPIO 51 (from the DSDT) |
 | Wi-Fi (Qualcomm QCC2072, Wi-Fi 7) | ✅ | needs a board file from Windows, see [Wi-Fi](#wi-fi) |
@@ -32,7 +32,7 @@ hardware does not work. With this DT, nearly everything does.
 | Headphone jack | ❌ | Qualcomm SoundWire SDCA codec, no Linux driver |
 | DisplayPort over USB-C | ✅ up to 1080p60 | both ports; link speed capped at HBR: at HBR2 the picture runs at half rate (likely a PHY driver bug), see [findings](docs/findings.md#displayport-over-usb-c) |
 | CPU frequency scaling | ❌ | firmware does not answer SCMI performance requests; CPUs stay at the clock UEFI set (~3.5 / 3.9 GHz) |
-| Real-time clock | ❌ | the PMIC RTC needs a UEFI variable (`RTCInfo`) that this laptop does not have. The time is correct once NTP syncs. |
+| Real-time clock | ❌ | `rtc0` registers, but reads a raw counter (1970), not real time. The time is correct once NTP syncs. |
 
 ## Repository layout
 
@@ -42,7 +42,7 @@ hardware does not work. With this DT, nearly everything does.
 | `bluetooth/` | Upstream QCC2072 patches (not merged yet), the diff as applied to 7.3, and build files |
 | `audio/ucm/` | ALSA UCM profile for the two speakers and the microphones |
 | `audio/wireplumber/` | Fixes the stereo channel order of the speakers |
-| `gpu/` | Environment variables that work around GPU rendering corruption, and a Chrome launcher |
+| `gpu/` | Mahua GPU kernel patches + build steps, or a Mesa workaround (environment variables, Chrome launcher) |
 | `suspend/omnibook-x16-dt` | systemd sleep hook that makes suspend work |
 | `grub/40_custom.example` | Example one-shot GRUB test entry |
 | `docs/findings.md` | What was found and how each problem was fixed |
@@ -116,24 +116,25 @@ back to `board.bin`. The right data is inside Windows' `bdwlan_qcc2072_1p0_ncm82
 
 - **Bluetooth:** see [bluetooth/README.md](bluetooth/README.md).
 - **Audio:** see [audio/README.md](audio/README.md).
-- **GPU:** add the lines from `gpu/environment-additions` to `/etc/environment`, then log out and in.
-  These variables only affect the msm GPU driver, which is not used in ACPI mode, so they are harmless there.
+- **GPU:** see [gpu/README.md](gpu/README.md). Either build the patched `msm.ko` (and apply patch 5 to
+  `mahua.dtsi` before building the DTB), or add the lines from `gpu/environment-additions` to `/etc/environment`.
 - **Suspend:** `sudo install -m 755 suspend/omnibook-x16-dt /usr/lib/systemd/system-sleep/`.
   The hook does nothing when you are not booted with this DT.
 
 ## GPU
 
-Hardware rendering works, but without a workaround the screen shows corruption: garbled blocks, diagonal
-half-screens, bands of colour. The cause is very likely the kernel reporting the full 4-slice GMEM size, while
-Mahua's GPU has 3 slices. linux-next has a fix that reports the active share; kernel 7.3.0-23 does not have it.
-The workaround tells Mesa to bypass GMEM:
+With the stock kernel 7.3, hardware rendering corrupts the screen (garbled blocks, diagonal half-screens,
+bands of colour). The driver reports the 4-slice GMEM size of Glymur's GPU, but Mahua's GPU has 3 slices.
 
-    FD_MESA_DEBUG=sysmem                 # OpenGL (freedreno): gnome-shell, most apps
-    TU_DEBUG=sysmem                      # Vulkan (turnip): GTK4 apps such as Ptyxis
-    WEBKIT_SKIA_ENABLE_CPU_RENDERING=1   # WebKitGTK apps (e.g. GNOME Help), which still caused GPU faults
+**Fix:** Qualcomm's series "drm/msm: Mahua GPU support" v1 (not merged yet) adds the right catalog entry
+(15.75 MB GMEM). Build `msm.ko` with patch 3, and build the DTB with patch 5 applied to `mahua.dtsi`.
+A small local shim is also needed until Mesa releases support for the new chip ID. With these, the desktop,
+Vulkan apps and WebKitGTK render cleanly with no workarounds.
 
-For Google Chrome, the OpenGL path still faulted the GPU, but Vulkan works. `gpu/google-chrome-omnibook` starts
-Chrome with `--use-angle=vulkan --enable-features=Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` when it runs in DT mode.
+**Without kernel changes:** set `FD_MESA_DEBUG=sysmem`, `TU_DEBUG=sysmem` and
+`WEBKIT_SKIA_ENABLE_CPU_RENDERING=1` in `/etc/environment`, and use the Chrome launcher.
+
+Details and build steps: [gpu/README.md](gpu/README.md).
 
 ## Bluetooth
 
@@ -145,6 +146,8 @@ an initramfs that contains them. Details: [bluetooth/README.md](bluetooth/README
 
 - The board wiring is based on the upstream `glymur-hp-elitebook-x-g2q.dts` (HP EliteBook X G2q) and
   `mahua-crd.dts`/`mahua.dtsi`, by the Linux kernel arm64/Qualcomm contributors.
+- Mahua GPU patches (series "drm/msm: Mahua GPU support" v1, September 2026): Jie Zhang and Akhil P Oommen
+  (Qualcomm), as posted to the kernel mailing lists.
 - QCC2072 Bluetooth patches (series "rb3-industrial-bt-uart" v2, July 2026): Vivek Sahu, Yepuri Siddu,
   Rahul Samana and Krishna Chaitanya Chundru (Qualcomm), as posted to the kernel mailing lists.
 - Investigation, device tree, fixes and write-up: Jeff R together with **Claude Opus 5.5** (Anthropic), working
@@ -154,5 +157,5 @@ an initramfs that contains them. Details: [bluetooth/README.md](bluetooth/README
 ## Licence
 
 - `dts/`: BSD-3-Clause (as in its SPDX header, like the upstream files it is based on).
-- `bluetooth/`: kernel patches, GPL-2.0.
+- `bluetooth/`, `gpu/patches/`: kernel patches, GPL-2.0 (the DTS patch follows `mahua.dtsi`'s licence).
 - Everything else (scripts, config files, documentation): MIT, see [LICENSE](LICENSE).
