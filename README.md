@@ -14,7 +14,7 @@ hardware does not work. With this DT, nearly everything does.
 | Hardware | Status | Notes |
 |---|---|---|
 | NVMe SSD, boot to desktop | ✅ | |
-| Internal display (16" Samsung OLED, eDP) | ✅ | msm DRM driver, `samsung,atna33xc20` panel |
+| Internal display (16" Samsung OLED, eDP) | ✅ | msm DRM driver, `samsung,atna33xc20` panel. Stock driver: about 1 in 20 screen wakes stays black; fixed with a local patch, see [display/README.md](display/README.md) |
 | Brightness (keys + slider) | ✅ | DP-AUX backlight |
 | GPU (Adreno X2-85, hardware rendering) | ✅ with patches | needs a patched `msm.ko` (Qualcomm's Mahua GPU series), or a Mesa workaround; see [GPU](#gpu) |
 | Keyboard, touchpad, lid switch, power key | ✅ | |
@@ -43,6 +43,7 @@ hardware does not work. With this DT, nearly everything does.
 | `audio/ucm/` | ALSA UCM profile for the two speakers and the microphones |
 | `audio/wireplumber/` | Fixes the stereo channel order of the speakers |
 | `gpu/` | Mahua GPU kernel patches + build steps, or a Mesa workaround (environment variables, Chrome launcher) |
+| `display/` | Local msm patch for the occasional black screen on wake (eDP link training) |
 | `suspend/omnibook-x16-dt` | systemd sleep hook that makes suspend work |
 | `grub/40_custom.example` | Example one-shot GRUB test entry |
 | `docs/findings.md` | What was found and how each problem was fixed |

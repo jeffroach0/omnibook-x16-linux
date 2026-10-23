@@ -51,6 +51,7 @@
 		i2c4 = &i2c4;
 		i2c8 = &i2c8;
 
+		serial0 = &uart21;	/* debug UART, as on the other Glymur/Mahua laptops; fixes "Invalid line -19" */
 		serial1 = &uart14;	/* DONOR; geni UART refuses to probe without an alias */
 	};
 

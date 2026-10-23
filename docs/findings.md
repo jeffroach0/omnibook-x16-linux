@@ -26,6 +26,12 @@ simpledrm keeps them on. Later the full msm display driver took over, and the no
 Samsung OLED (product 0x4214), including DP-AUX backlight control. Enable GPIO 18 and panel power GPIO 70 (DONOR)
 are now verified by behaviour.
 
+**Black screen on wake (about 1 in 20).** When the panel powers back on, link training sometimes fails at the
+channel-equalization step. The msm driver then falls back from 2 lanes to 1 lane and trains that, but the panel's
+maximum (2 lanes at HBR) is exactly what 1920x1200@60 needs, so the 1-lane link shows nothing. The next off/on
+recovered every time. *Fix (local patch):* retry at the original rate and lane count when the fallback link is too
+slow for the mode. See [display/README.md](../display/README.md).
+
 ## GPU
 
 `glymur.dtsi` leaves the GPU nodes enabled, so enabling the display also brought up the Adreno GPU. GNOME then
@@ -152,8 +158,7 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   Where Windows keeps the real offset is unknown. The time is fine once NTP syncs.
 - **Headphone jack:** no Linux driver for the Qualcomm SDCA codec.
 - **DisplayPort over USB-C above HBR:** see [DisplayPort over USB-C](#displayport-over-usb-c).
-- Minor: `GICv3: SPI 4115 out of range`. Also, the debug UART (`894000.serial`) has no alias. Adding one would let
-  interconnect `sync_state()` run and drop bandwidth votes that simpledrm relies on, so it was left alone.
+- Minor: `GICv3: SPI 4115 out of range`.
 
 ## Things that are easy to get wrong
 

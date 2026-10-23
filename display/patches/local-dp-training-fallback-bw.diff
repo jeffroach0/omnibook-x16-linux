@@ -1,0 +1,65 @@
+diff --git a/drivers/gpu/drm/msm/dp/dp_ctrl.c b/drivers/gpu/drm/msm/dp/dp_ctrl.c
+--- a/drivers/gpu/drm/msm/dp/dp_ctrl.c
++++ b/drivers/gpu/drm/msm/dp/dp_ctrl.c
+@@ -2318,6 +2318,19 @@ static bool msm_dp_ctrl_clock_recovery_any_ok(
+ 	return drm_dp_clock_recovery_ok(link_status, reduced_cnt);
+ }
+ 
++/*
++ * rate is the link symbol rate in kHz and 8b/10b carries one byte per
++ * symbol per lane, so the link moves rate * lanes * 8 kbit/s of pixel data.
++ */
++static bool msm_dp_ctrl_link_bw_ok(struct msm_dp_ctrl_private *ctrl,
++				   unsigned long pixel_rate, u32 bpp)
++{
++	struct msm_dp_link_info *link_params = &ctrl->link->link_params;
++
++	return (u64)link_params->rate * link_params->num_lanes * 8 >=
++	       (u64)pixel_rate * bpp;
++}
++
+ static bool msm_dp_ctrl_channel_eq_ok(struct msm_dp_ctrl_private *ctrl)
+ {
+ 	u8 link_status[DP_LINK_STATUS_SIZE];
+@@ -2335,6 +2348,7 @@ int msm_dp_ctrl_on_link(struct msm_dp_ctrl *msm_dp_ctrl,
+ 	struct msm_dp_ctrl_private *ctrl;
+ 	u32 rate;
+ 	int link_train_max_retries = 5;
++	unsigned int rate_set;
+ 	u32 const phy_cts_pixel_clk_khz = 148500;
+ 	u8 link_status[DP_LINK_STATUS_SIZE];
+ 	unsigned int training_step;
+@@ -2371,6 +2385,8 @@ int msm_dp_ctrl_on_link(struct msm_dp_ctrl *msm_dp_ctrl,
+ 	if (rc)
+ 		return rc;
+ 
++	rate_set = ctrl->link->link_params.rate_set;
++
+ 	while (--link_train_max_retries) {
+ 		training_step = DP_TRAINING_NONE;
+ 		rc = msm_dp_ctrl_setup_main_link(ctrl, panel, &training_step);
+@@ -2424,6 +2440,24 @@ int msm_dp_ctrl_on_link(struct msm_dp_ctrl *msm_dp_ctrl,
+ 			msm_dp_ctrl_clear_training_pattern(ctrl, panel, DP_PHY_DPRX);
+ 		}
+ 
++		/*
++		 * A fallback link that cannot carry the mode trains fine but
++		 * shows no picture (seen on eDP panels that only do 2 lanes
++		 * at HBR). Retry at the original rate and lane count instead.
++		 */
++		if (!msm_dp_ctrl_link_bw_ok(ctrl, pixel_rate,
++					    panel->msm_dp_mode.bpp)) {
++			DRM_INFO("fallback link rate=%u lanes=%u too slow for mode, retrying at rate=%u lanes=%u\n",
++				 ctrl->link->link_params.rate,
++				 ctrl->link->link_params.num_lanes,
++				 rate, panel->link_info.num_lanes);
++			ctrl->link->link_params.rate = rate;
++			ctrl->link->link_params.rate_set = rate_set;
++			ctrl->link->link_params.num_lanes = panel->link_info.num_lanes;
++			ctrl->link->phy_params.p_level = 0;
++			ctrl->link->phy_params.v_level = 0;
++		}
++
+ 		rc = msm_dp_ctrl_reinitialize_mainlink(ctrl, panel);
+ 		if (rc) {
+ 			DRM_ERROR("Failed to reinitialize mainlink. rc=%d\n", rc);
