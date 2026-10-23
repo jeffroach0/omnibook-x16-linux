@@ -170,7 +170,6 @@ Not a device tree issue, but it affects the normal (ACPI) boot of the same insta
   Where Windows keeps the real offset is unknown. The time is fine once NTP syncs.
 - **Headphone jack:** no Linux driver for the Qualcomm SDCA codec.
 - **DisplayPort over USB-C above HBR:** see [DisplayPort over USB-C](#displayport-over-usb-c).
-- Minor: `GICv3: SPI 4115 out of range`.
 
 ## Things that are easy to get wrong
 
@@ -181,3 +180,7 @@ Not a device tree issue, but it affects the normal (ACPI) boot of the same insta
 - In `/sys/kernel/debug/gpio` for LPASS pins, the number after `in`/`out` is the pin *function*, not its level.
 - With the clock starting at a fake date on every boot (no RTC), journald may delete a test boot's log.
   `/var/log/kern.log` from rsyslog kept it.
+- `GICv3: SPI 4115 out of range (use ESPI?)` at boot is harmless. It is the lid switch: GPIO 92 maps to PDC pin 182,
+  which `glymur.dtsi` (`qcom,pdc-ranges <171 4104 36>`) routes to interrupt 4104 + 11 = 4115, in the GIC's extended
+  SPI range. The PDC driver passes it as a plain SPI, so the GIC driver warns (once), but it still works out the
+  correct interrupt and the lid works. Not a board DTS issue; any fix belongs in `qcom-pdc.c` or `glymur.dtsi`.
