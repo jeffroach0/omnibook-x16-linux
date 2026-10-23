@@ -68,9 +68,18 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
   for a 60 Hz mode, so the display timing ran at half the pixel clock the stream header promised.
 - *Workaround:* cap `link-frequencies` at HBR (2.7 Gbps). Then the stream runs at 60.000 Hz and the picture is fine.
   2 lanes at HBR is enough for 1080p60, not for 1440p60 or 4K60.
-- Likely cause (not yet proven by a patched driver): `qmp_v8_configure_dp_clocks()` in `phy-qcom-qmp-combo.c` uses a
-  VCO divider of 0x4 for 5.4 Gbps (0x2 for 2.7 Gbps). The Glymur eDP PHY driver (`phy-qcom-edp.c`) uses 0x2 for
-  5.4 Gbps and 0x1 for 8.1 Gbps (combo PHY: 0x3). 8.1 Gbps is untested.
+- My first guess was the VCO divider in `qmp_v8_configure_dp_clocks()` (`phy-qcom-qmp-combo.c`). That was wrong: the
+  real fix is Qualcomm's series "phy: qualcomm: qmp-combo: update DP PHY PLL programming on Glymur" v5
+  (https://lore.kernel.org/linux-arm-msm/20261001-glymur-phy-v3-v5-0-3848c2615d5a@oss.qualcomm.com/), which
+  reworks the DP PHY PLL/init tables and removes the VCO_DIV programming altogether.
+- **With that series** (11 patches on the 7.3 `phy-qcom-qmp-combo.c`, built out of tree; the module probes from the
+  initramfs, so the initramfs must be rebuilt) and the `link-frequencies` cap removed: HBR2 on 2 lanes, sharp
+  picture, DP stream measured at 60.000 Hz, DPCD lane status `77 00 81`. Works in both plug orientations. Plain
+  USB 3 on the patched PHY is fine. Tested on the back port only.
+- Seen with the series, intermittent, cause unknown (PHY, hub or cable): one of four hub plug-ins gave no picture
+  (DPCD lane status `00 00 80`, no clock recovery; replugging fixed it), and on three of four plug-ins the hub's
+  USB 3 side kept re-enumerating while DP was running (stopped when HDMI was unplugged).
+- The DTS in this repo keeps the HBR cap, so it works with the stock driver. Remove it only together with the series.
 
 ## USB
 
