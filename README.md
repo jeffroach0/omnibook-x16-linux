@@ -30,7 +30,7 @@ hardware does not work. With this DT, nearly everything does.
 | Audio DSP / compute DSP (ADSP, CDSP) | ✅ | firmware from Windows |
 | Suspend (s2idle) | ✅ with a sleep hook | deep sleep is refused by the firmware |
 | Headphone jack | ❌ | Qualcomm SoundWire SDCA codec, no Linux driver |
-| DisplayPort over USB-C | ✅ up to 1080p60 (stock) / ✅ HBR2 with patches | both ports. Stock 7.3 PHY driver: the DTS caps the link at HBR, because HBR2 runs at half rate. With Qualcomm's Glymur DP PHY series (v5) HBR2 works; occasional no-picture or hub USB 3 drops seen. See [findings](docs/findings.md#displayport-over-usb-c) |
+| DisplayPort over USB-C | ✅ up to 1080p60 (stock) / ✅ HBR2 with patches | both ports. Stock 7.3 PHY driver: the DTS caps the link at HBR, because HBR2 runs at half rate. With Qualcomm's Glymur DP PHY series (v5) HBR2 works on both ports; occasional no-picture or hub USB 3 drops seen. See [findings](docs/findings.md#displayport-over-usb-c) |
 | CPU frequency scaling | ❌ | firmware does not answer SCMI performance requests; CPUs stay at the clock UEFI set (~3.5 / 3.9 GHz) |
 | Real-time clock | ❌ | `rtc0` registers, but reads a raw counter (1970), not real time. The time is correct once NTP syncs. |
 

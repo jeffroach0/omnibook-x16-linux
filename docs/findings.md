@@ -81,8 +81,9 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
 - **With that series** (11 patches on the 7.3 `phy-qcom-qmp-combo.c`, built out of tree; the module probes from the
   initramfs, so the initramfs must be rebuilt) and the `link-frequencies` cap removed: HBR2 on 2 lanes, sharp
   picture, DP stream measured at 60.000 Hz, DPCD lane status `77 00 81`. Works in both plug orientations. Plain
-  USB 3 on the patched PHY is fine. Tested on the back port only.
-- Seen with the series, intermittent, cause unknown (PHY, hub or cable): one of four hub plug-ins gave no picture
+  USB 3 on the patched PHY is fine. Front port too: HBR2 on 2 lanes, 60.000 Hz, lane status `77 00 01`, hub USB 3
+  stable (one plug-in so far).
+- Seen with the series on the back port, intermittent, cause unknown (PHY, hub or cable): one of four hub plug-ins gave no picture
   (DPCD lane status `00 00 80`, no clock recovery; replugging fixed it), and on three of four plug-ins the hub's
   USB 3 side kept re-enumerating while DP was running (stopped when HDMI was unplugged).
 - The DTS in this repo keeps the HBR cap, so it works with the stock driver. Remove it only together with the series.
