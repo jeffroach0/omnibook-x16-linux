@@ -44,6 +44,7 @@ hardware does not work. With this DT, nearly everything does.
 | `audio/wireplumber/` | Fixes the stereo channel order of the speakers |
 | `gpu/` | Mahua GPU kernel patches + build steps, or a Mesa workaround (environment variables, Chrome launcher) |
 | `display/` | Local msm patch for the occasional black screen on wake (eDP link training) |
+| `acpi-mode/` | Stops a kernel log flood in the normal ACPI boot (broken ACPI clock driver `acpi_tad`) |
 | `suspend/omnibook-x16-dt` | systemd sleep hook that makes suspend work |
 | `grub/40_custom.example` | Example one-shot GRUB test entry |
 | `docs/findings.md` | What was found and how each problem was fixed |

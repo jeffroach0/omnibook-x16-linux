@@ -1,0 +1,16 @@
+# OmniBook X 16: unload acpi_tad if the initramfs already loaded it (see
+# /etc/modprobe.d/blacklist-acpi-tad.conf). Runs before chrony, whose rtcsync
+# setting is what starts the endless failing clock writes. Does nothing in DT mode.
+[Unit]
+Description=Unload broken ACPI time device driver (OmniBook X16 log flood)
+DefaultDependencies=no
+After=systemd-modules-load.service
+Before=sysinit.target chrony.service systemd-timesyncd.service
+ConditionPathExists=/sys/module/acpi_tad
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/modprobe -r acpi_tad
+
+[Install]
+WantedBy=sysinit.target

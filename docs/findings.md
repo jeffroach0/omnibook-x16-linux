@@ -148,6 +148,17 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   every later suspend then fails. Unbinding it before sleep and binding it after resume avoids that.
 - `suspend/omnibook-x16-dt` does all three. Tested with repeated suspends.
 
+## ACPI mode: kernel log flood
+
+Not a device tree issue, but it affects the normal (ACPI) boot of the same install.
+- In ACPI mode the `acpi_tad` driver binds the ACPI time device `\_SB.PRTC`. Its `_GRT`/`_SRT` methods use a
+  GenericSerialBus region (`ROP1`) that Linux has no handler for, so every clock read and write fails.
+- Once NTP sets the clock (chrony `rtcsync`), the kernel keeps retrying the write: about 120 "ACPI Error" lines per
+  second for the whole boot (millions of lines, gigabytes of `kern.log`/`syslog`/journal).
+- Fix: `acpi-mode/blacklist-acpi-tad.conf` in `/etc/modprobe.d/`, plus `acpi-mode/omnibook-no-acpi-tad.service`
+  (enable it) to unload the driver early if an initramfs loaded it anyway. Tested in an ACPI boot: no `PRTC` errors.
+  There is no RTC in ACPI mode then; the time comes from NTP. The driver never loads in DT mode.
+
 ## Still open
 
 - **CPU frequency:** `scmi_cpufreq` gets no answer from the firmware for SCMI performance requests (protocol 0x13,
