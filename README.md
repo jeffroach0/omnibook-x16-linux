@@ -20,7 +20,7 @@ hardware does not work. With this DT, nearly everything does.
 | Keyboard, touchpad, lid switch, power key | ✅ | |
 | Touchscreen (ELAN, I2C) | ✅ | `i2c8`, address 0x10, interrupt GPIO 51 (from the DSDT) |
 | Wi-Fi (Qualcomm QCC2072, Wi-Fi 7) | ✅ | needs a board file from Windows, see [Wi-Fi](#wi-fi) |
-| Bluetooth (QCC2072) | ⚠️ works with patched modules | not in kernel 7.3, see [Bluetooth](#bluetooth) |
+| Bluetooth (QCC2072) | ⚠️ works with patched modules | not in kernel 7.3, see [Bluetooth](#bluetooth). Pairing, audio and earbud mic tested |
 | USB-C ports (both, left side): USB 3, charging, plug orientation | ✅ | via pmic-glink |
 | USB-A port (right side), USB 3 + USB 2 | ✅ | |
 | Battery status | ✅ | |
@@ -141,6 +141,12 @@ Details and build steps: [gpu/README.md](gpu/README.md).
 Kernel 7.3 has no QCC2072 Bluetooth support. The upstream patch series (v2, July 2026, not merged as of
 October 2026) adds it. Build the patched `btqca`, `hci_uart` and `pwrseq-pcie-m2` modules out of tree, and use
 an initramfs that contains them. Details: [bluetooth/README.md](bluetooth/README.md).
+
+Bluetooth audio works (tested with Pixel Buds Pro 2): music in A2DP mode (Opus codec), and the earbud
+microphone in both A2DP mode (duplex mic) and headset mode (HFP, for calls). GNOME does not always switch
+the default input/output to the earbuds when they connect; pick them in Settings > Sound. After a mode
+switch, A2DP once disappeared from the earbuds' profile list (a Bluetooth transport error); reconnecting
+the earbuds brought it back.
 
 ## Credits
 

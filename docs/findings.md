@@ -97,6 +97,14 @@ upstream patches (see `bluetooth/`), it works over `uart14`, including pairing.
 The firmware is linux-firmware's `ornbtfw11.tlv` / `ornnv11.bin`. The board-specific `ornnv11.b17` does not exist
 yet, and the driver falls back to the generic file.
 
+Audio over Bluetooth (PipeWire + WirePlumber, Pixel Buds Pro 2): A2DP playback with the Opus codec works. The
+earbud microphone works in A2DP duplex mode (source `bluez_input.<address>`) and in HFP headset mode (source
+`bluez_input.<address with underscores>.0`). Both test recordings had normal speech levels. Note that
+PipeWire node names use underscores in the address (`bluez_output.XX_XX_XX_XX_XX_XX.1`); a `pw-play --target` with a
+wrong name silently falls back to the default output. Once, after switching to HFP and back, WirePlumber
+logged `Acquire ... returned error: org.bluez.Error.Failed` and the A2DP profiles vanished until the earbuds
+were reconnected.
+
 ## DSPs
 
 The ADSP and CDSP need the OEM-signed firmware from the Windows driver store (`qcadsp8480.mbn`, `qccdsp8480.mbn`).
