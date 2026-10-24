@@ -142,6 +142,14 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   device found" is printed when Linux creates the device from the DT. It does **not** mean the device answered on
   the bus. Several theories (runtime PM clock stop, the reset pulse) were tested and ruled out before it was clear
   that the laptop simply has two speakers.
+- DisplayPort/HDMI audio: the Glymur topology Ubuntu ships (`GLYMUR-CRD-tplg.bin`) has only the speaker and
+  microphone paths. The X1E80100 CRD topology also has DisplayPort 0/1 paths, and it runs on the Mahua audio DSP
+  unchanged. The DT adds the two DisplayPort sound links (as on the ThinkPad T14s Gen 7) and uses the card name
+  `HP-OmniBook-X16-DP`, whose topology file is a symlink to the X1E one. Tested on a TV through a USB-C hub on
+  both ports: left/right correct; speakers and microphones still work.
+- With that topology the UCM file must keep the DisplayPort routes on all the time (PipeWire tests every output
+  with only the base setup active and drops the whole profile if one fails to open), and the microphone device
+  only starts with 4 channels. Speech also came out about 6 dB quieter, so the mic gain is 118 instead of 112.
 - See `audio/README.md` for the UCM and WirePlumber files.
 
 ## Suspend

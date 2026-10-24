@@ -244,10 +244,15 @@
 	 * Stage 8c: only TWO speakers (both on swr0, GUESS from boots 13-15 +
 	 * Windows 2-ch endpoint + spec sites). ALSA must use a two-speaker UCM
 	 * (/usr/share/alsa/ucm2/conf.d/glymur/HP-...-8F46.conf), not GLYMUR-CRD.
+	 * DP audio links (DisplayPort0/1, from the T14s). model "HP-OmniBook-X16-DP"
+	 * -> qcom/glymur/HP-OmniBook-X16-DP-tplg.bin = symlink to the X1E80100-CRD
+	 * topology (WSA + VA + DP0 + DP1). VERIFIED Oct 24: the X1E topology runs on
+	 * the Mahua ADSP; TV audio on both USB-C ports, L/R correct; speakers + mics OK.
+	 * Needs ucm2 Qualcomm/glymur/HP-OmniBook-X16-DP-HiFi.conf (mic = 4 ch).
 	 */
 	sound {
 		compatible = "qcom,glymur-sndcard";
-		model = "GLYMUR-CRD";
+		model = "HP-OmniBook-X16-DP";
 
 		audio-routing = "SpkrLeft IN", "WSA WSA_SPK1 OUT",
 				"SpkrRight IN", "WSA WSA_SPK2 OUT",
@@ -280,6 +285,38 @@
 
 			cpu {
 				sound-dai = <&q6apmbedai WSA_CODEC_DMA_RX_0>;
+			};
+
+			platform {
+				sound-dai = <&q6apm>;
+			};
+		};
+
+		displayport-0-dai-link {
+			link-name = "DisplayPort0 Playback";
+
+			codec {
+				sound-dai = <&mdss_dp0>;
+			};
+
+			cpu {
+				sound-dai = <&q6apmbedai DISPLAY_PORT_RX_0>;
+			};
+
+			platform {
+				sound-dai = <&q6apm>;
+			};
+		};
+
+		displayport-1-dai-link {
+			link-name = "DisplayPort1 Playback";
+
+			codec {
+				sound-dai = <&mdss_dp1>;
+			};
+
+			cpu {
+				sound-dai = <&q6apmbedai DISPLAY_PORT_RX_1>;
 			};
 
 			platform {

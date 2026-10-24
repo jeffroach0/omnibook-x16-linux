@@ -32,6 +32,7 @@ hardware does not work. With this DT, nearly everything does.
 | Webcam (HP True Vision FHD, RGB + IR) | ✅ | |
 | Speakers (2, stereo) | ✅ | needs UCM + WirePlumber files, see [Audio](#audio) |
 | Built-in microphones | ✅ | |
+| Audio over DisplayPort/HDMI (both USB-C ports) | ✅ | uses the X1E80100 CRD audio topology + UCM file, see [audio/README.md](audio/README.md) |
 | Audio DSP / compute DSP (ADSP, CDSP) | ✅ | firmware from Windows |
 | Suspend (s2idle) | ✅ with a sleep hook | deep sleep is refused by the firmware |
 | Headphone jack | ❌ | Qualcomm SoundWire SDCA codec, no Linux driver |
@@ -45,7 +46,7 @@ hardware does not work. With this DT, nearly everything does.
 |---|---|
 | `dts/mahua-hp-omnibook-x16.dts` | The device tree source. Comments mark each part VERIFIED / DONOR / GUESS. |
 | `bluetooth/` | Upstream QCC2072 patches (not merged yet), the diff as applied to 7.3, and build files |
-| `audio/ucm/` | ALSA UCM profile for the two speakers and the microphones |
+| `audio/ucm/` | ALSA UCM profile for the two speakers, the microphones and DisplayPort/HDMI audio |
 | `audio/wireplumber/` | Fixes the stereo channel order of the speakers |
 | `gpu/` | Mahua GPU kernel patches + build steps, or a Mesa workaround (environment variables, Chrome launcher) |
 | `cpufreq/` | How to rebuild only the kernel image with the CPU frequency drivers built in |
