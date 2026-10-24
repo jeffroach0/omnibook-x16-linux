@@ -138,7 +138,7 @@ bands of colour). The driver reports the 4-slice GMEM size of Glymur's GPU, but 
 **Fix:** Qualcomm's series "drm/msm: Mahua GPU support" v1 (not merged yet) adds the right catalog entry
 (15.75 MB GMEM). Build `msm.ko` with patch 3, and build the DTB with patch 5 applied to `mahua.dtsi`.
 A small local shim is also needed until Mesa releases support for the new chip ID. With these, the desktop,
-Vulkan apps and WebKitGTK render cleanly with no workarounds.
+Vulkan apps, WebKitGTK and Google Chrome render cleanly with no workarounds.
 
 **Without kernel changes:** set `FD_MESA_DEBUG=sysmem`, `TU_DEBUG=sysmem` and
 `WEBKIT_SKIA_ENABLE_CPU_RENDERING=1` in `/etc/environment`, and use the Chrome launcher.

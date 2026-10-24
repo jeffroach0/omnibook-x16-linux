@@ -28,7 +28,8 @@ The two parts must be used together. A DTB with patch 5 and a stock `msm.ko` giv
 
 Tested: Ubuntu Concept kernel 7.3.0-21-qcom-x1e, Mesa 26.2.4: gnome-shell (OpenGL), Ptyxis (Vulkan) and
 GNOME Help (WebKitGTK GPU raster) are clean, with no GPU faults and none of the Option B variables set.
-Chrome with the patches is not tested yet.
+Google Chrome (arm64 .deb) also works with the patches on its default OpenGL path: hardware accelerated,
+pages and YouTube clean, no GPU faults. The `google-chrome-omnibook` launcher is only needed with Option B.
 
 ### Build `msm.ko` out of tree
 
