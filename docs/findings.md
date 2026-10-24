@@ -102,7 +102,8 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
   determine orientation & mode from data-lanes" (27 times per boot here) and falls back to its default. Adding a
   `port@0` endpoint with `data-lanes = <1 0>` (USB 3, normal orientation) puts the PHY in USB 3 only mode and
   the warning goes away. Tested Oct 24 with the upstream DTS: USB 3 stick at 5000M and a low-speed USB 2 mouse
-  both work. (Found by the Sashiko review bot on the upstream patch.)
+  both work. Also confirmed on the everyday DT boot, including a mouse plugged in after boot.
+  (Found by the Sashiko review bot on the upstream patch.)
 - Webcam: on the internal USB 2 controller `usb_hs` (HP True Vision FHD, `30c9:00d9`, RGB + IR).
 
 ## Wi-Fi
