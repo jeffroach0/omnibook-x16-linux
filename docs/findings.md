@@ -146,7 +146,11 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   (`0004:00:00.0`) fixes that. Wi-Fi still reconnects after resume.
 - The webcam's USB controller (`usb_hs`, `a200000.usb`) crashes on resume (SMMU context fault, "HC died"), and
   every later suspend then fails. Unbinding it before sleep and binding it after resume avoids that.
-- `suspend/omnibook-x16-dt` does all three. Tested with repeated suspends.
+- Real fix: Qualcomm's patch that lets the USB power domains keep their state (retention) instead of switching off
+  (`gcc-glymur`, [lore](https://lore.kernel.org/all/20261016-glymur-usb-ret-on-v1-1-1790a523fd9c@oss.qualcomm.com/)).
+  Built as an out-of-tree `gcc-glymur.ko`, the webcam survives resume without the unbind (tested several times).
+- `suspend/omnibook-x16-dt` sets s2idle and disables the Wi-Fi wakeup. It unbinds the webcam controller only when
+  the patched `gcc-glymur` is not loaded (it compares the module's `srcversion`; set yours in the script).
 
 ## CPU frequency scaling
 

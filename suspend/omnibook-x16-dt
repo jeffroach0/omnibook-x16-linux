@@ -1,21 +1,28 @@
 #!/bin/sh
-# systemd-sleep hook for the HP OmniBook X16 device-tree test boot.
+# systemd-sleep hook for the HP OmniBook X16 device-tree boot.
 # Does nothing in normal (ACPI) mode.
 # pre:  use s2idle (firmware refuses deep: PSCI SYSTEM_SUSPEND -> -EOPNOTSUPP),
-#       stop the Wi-Fi PCIe WAKE# (gpio148) from waking us,
-#       unbind the webcam USB controller (usb_hs dies on resume otherwise).
-# post: bind the webcam controller again.
+#       stop the Wi-Fi PCIe WAKE# (gpio148) from waking us.
+# The webcam USB controller (usb_hs) used to die on resume (SMMU fault). The
+# patched gcc-glymur.ko (updates/glymur-usb-ret, "glymur-usb-ret-on" series)
+# fixes that. Only if the stock gcc-glymur is loaded do we still unbind the
+# controller before sleep and bind it again after.
 
 grep -aqs 'HP OmniBook X Laptop 16' /proc/device-tree/model || exit 0
 
 WIFI_RP=/sys/bus/pci/devices/0004:00:00.0/power/wakeup
 DWC=/sys/bus/platform/drivers/dwc3-qcom
+# srcversion of the patched gcc-glymur.ko (cat /sys/module/gcc_glymur/srcversion
+# with it loaded). This value is from our build against Ubuntu 7.3.0-23 source;
+# set your own. Without the patch the unbind below is still needed.
+USB_RET_FIX=6FA891ED339A622A36725FB
 
 case "$1" in
 pre)
 	echo s2idle > /sys/power/mem_sleep 2>/dev/null
 	[ -w "$WIFI_RP" ] && echo disabled > "$WIFI_RP"
-	[ -e "$DWC/a200000.usb" ] && echo a200000.usb > "$DWC/unbind"
+	[ "$(cat /sys/module/gcc_glymur/srcversion 2>/dev/null)" = "$USB_RET_FIX" ] ||
+		{ [ -e "$DWC/a200000.usb" ] && echo a200000.usb > "$DWC/unbind"; }
 	;;
 post)
 	[ -e "$DWC/a200000.usb" ] || echo a200000.usb > "$DWC/bind"
