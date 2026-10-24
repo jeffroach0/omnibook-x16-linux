@@ -1,8 +1,10 @@
 #!/bin/sh
 # Start Google Chrome; in DT mode (custom device tree, msm GPU) make it render
 # through Vulkan (turnip). Chrome's default OpenGL path faults the GPU and
-# corrupts pages (Oct 19). In ACPI mode there is no /proc/device-tree/model,
-# so Chrome starts normally. Delete this file + the .desktop override to undo.
+# corrupts pages (Oct 19). With the Mahua GPU patches it no longer faults, but
+# still draws small black blocks now and then (Oct 24). In ACPI mode there is
+# no /proc/device-tree/model, so Chrome starts normally. Delete this file + the
+# .desktop override to undo.
 if grep -q -s 'HP OmniBook' /proc/device-tree/model; then
   exec /usr/bin/google-chrome-stable --use-angle=vulkan \
     --enable-features=Vulkan,DefaultANGLEVulkan,VulkanFromANGLE "$@"

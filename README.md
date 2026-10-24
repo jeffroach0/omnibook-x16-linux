@@ -48,7 +48,7 @@ hardware does not work. With this DT, nearly everything does.
 | `bluetooth/` | Upstream QCC2072 patches (not merged yet), the diff as applied to 7.3, and build files |
 | `audio/ucm/` | ALSA UCM profile for the two speakers, the microphones and DisplayPort/HDMI audio |
 | `audio/wireplumber/` | Fixes the stereo channel order of the speakers |
-| `gpu/` | Mahua GPU kernel patches + build steps, or a Mesa workaround (environment variables, Chrome launcher) |
+| `gpu/` | Mahua GPU kernel patches + build steps, or a Mesa workaround (environment variables); Chrome launcher |
 | `cpufreq/` | How to rebuild only the kernel image with the CPU frequency drivers built in |
 | `display/` | Local msm patch for the occasional black screen on wake (eDP link training) |
 | `acpi-mode/` | Stops a kernel log flood in the normal ACPI boot (broken ACPI clock driver `acpi_tad`) |
@@ -138,7 +138,8 @@ bands of colour). The driver reports the 4-slice GMEM size of Glymur's GPU, but 
 **Fix:** Qualcomm's series "drm/msm: Mahua GPU support" v1 (not merged yet) adds the right catalog entry
 (15.75 MB GMEM). Build `msm.ko` with patch 3, and build the DTB with patch 5 applied to `mahua.dtsi`.
 A small local shim is also needed until Mesa releases support for the new chip ID. With these, the desktop,
-Vulkan apps, WebKitGTK and Google Chrome render cleanly with no workarounds.
+Vulkan apps and WebKitGTK render cleanly with no workarounds. Google Chrome still needs the launcher
+(`gpu/google-chrome-omnibook`, Vulkan): its OpenGL path shows small black blocks now and then.
 
 **Without kernel changes:** set `FD_MESA_DEBUG=sysmem`, `TU_DEBUG=sysmem` and
 `WEBKIT_SKIA_ENABLE_CPU_RENDERING=1` in `/etc/environment`, and use the Chrome launcher.

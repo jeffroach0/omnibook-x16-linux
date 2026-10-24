@@ -28,8 +28,9 @@ The two parts must be used together. A DTB with patch 5 and a stock `msm.ko` giv
 
 Tested: Ubuntu Concept kernel 7.3.0-21-qcom-x1e, Mesa 26.2.4: gnome-shell (OpenGL), Ptyxis (Vulkan) and
 GNOME Help (WebKitGTK GPU raster) are clean, with no GPU faults and none of the Option B variables set.
-Google Chrome (arm64 .deb) also works with the patches on its default OpenGL path: hardware accelerated,
-pages and YouTube clean, no GPU faults. The `google-chrome-omnibook` launcher is only needed with Option B.
+Google Chrome (arm64 .deb) with the patches: no GPU faults on its default OpenGL path, but small black
+blocks still appear now and then, mostly on Chrome's own bookmarks bar. On Vulkan it is clean, so use the
+`google-chrome-omnibook` launcher (see Option B) with both options.
 
 ### Build `msm.ko` out of tree
 
@@ -81,6 +82,7 @@ Add the lines from `environment-additions` to `/etc/environment`, then log out a
 These make Mesa skip GMEM (slower). They only affect the msm GPU driver, which is not used in ACPI mode.
 Google Chrome's OpenGL path still faulted the GPU this way. `google-chrome-omnibook` starts Chrome on
 Vulkan (`--use-angle=vulkan --enable-features=Vulkan,DefaultANGLEVulkan,VulkanFromANGLE`) in DT mode.
+The launcher is also needed with Option A (black blocks on the OpenGL path).
 
 If you switch from Option B to Option A, remove the lines. Note that logging out does not clear them
 from the systemd user manager: reboot, or run

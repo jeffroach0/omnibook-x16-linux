@@ -46,7 +46,8 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
 - WebKitGTK's GPU raster (Skia) still caused real GPU page faults and hangs.
   `WEBKIT_SKIA_ENABLE_CPU_RENDERING=1` fixes it.
 - Chrome's default ANGLE-on-OpenGL path faulted the GPU even with `sysmem`. ANGLE on Vulkan works.
-  With the Mahua GPU patches (below), the default path works too (tested Oct 24), so no launcher is needed.
+  With the Mahua GPU patches (below), the default path no longer faults, but small black blocks still show up
+  now and then (mostly Chrome's bookmarks bar, Oct 24). ANGLE on Vulkan is clean, so the launcher stays.
 - *Fix (Oct 22):* on linux-arm-msm, Akhil P Oommen pointed to the series "drm/msm: Mahua GPU support" v1.
   It gives Mahua its own catalog entry (chip ID 0x44060000, GMEM 15.75 MB = 3/4 of Glymur's). Patch 3 (driver)
   and patch 5 (`mahua.dtsi`) were applied, with `msm.ko` built out of tree. The driver then reports
