@@ -97,6 +97,12 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
 - USB-A (`usb_2`, right side): ACPI shows this port as USB 3 Standard-A. A guessed smb2370 repeater at SPMI SID 0xb
   does not exist (probe fails with -5). Without any repeater node, both USB 3 and USB 2 work, because UEFI leaves
   the repeater set up.
+- USB-A QMP PHY: this port has no Type-C orientation or mode switch, so the DTS deletes `mode-switch` and
+  `orientation-switch` from `usb_2_qmpphy`. Without static `data-lanes` the driver then prints "unable to
+  determine orientation & mode from data-lanes" (27 times per boot here) and falls back to its default. Adding a
+  `port@0` endpoint with `data-lanes = <1 0>` (USB 3, normal orientation) puts the PHY in USB 3 only mode and
+  the warning goes away. Tested Oct 24 with the upstream DTS: USB 3 stick at 5000M and a low-speed USB 2 mouse
+  both work. (Found by the Sashiko review bot on the upstream patch.)
 - Webcam: on the internal USB 2 controller `usb_hs` (HP True Vision FHD, `30c9:00d9`, RGB + IR).
 
 ## Wi-Fi
