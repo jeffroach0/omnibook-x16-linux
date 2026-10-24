@@ -1038,6 +1038,27 @@
 	/delete-property/ orientation-switch;
 
 	status = "okay";
+
+	/*
+	 * Static USB3-only lanes (<1 0> = USB3, normal orientation). Without them
+	 * qmp_combo_probe() warns "unable to determine orientation & mode from
+	 * data-lanes" and stays in USB3+DP mode. VERIFIED (Oct 24): warning gone,
+	 * USB-A still works at 5000M and USB2.
+	 */
+	ports {
+		port@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			/delete-node/ endpoint;
+
+			usb_2_qmpphy_out_usb: endpoint@1 {
+				reg = <1>;
+
+				data-lanes = <1 0>;
+			};
+		};
+	};
 };
 
 /*
