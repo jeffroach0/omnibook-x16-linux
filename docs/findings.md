@@ -148,6 +148,18 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   every later suspend then fails. Unbinding it before sleep and binding it after resume avoids that.
 - `suspend/omnibook-x16-dt` does all three. Tested with repeated suspends.
 
+## CPU frequency scaling
+
+- With Ubuntu's kernel, `scmi_cpufreq` gets no answer from the firmware for SCMI performance requests (protocol 0x13):
+  "timed out in resp", probe -110. The CPUs stay at the clock UEFI set (~3.5 / 3.9 GHz). ACPI has no CPU performance
+  control either.
+- The SCMI channel itself works (base protocol queries answer long after boot), and the firmware lists protocol 0x13,
+  but ignores every perf message. Loading `qcom_cpucp_mbox` and `scmi_cpufreq` from the initramfs (about 1 s into
+  boot) does not help.
+- Fix (Konrad Dybcio: "Timing."): build `CONFIG_QCOM_CPUCP_MBOX` and `CONFIG_ARM_SCMI_CPUFREQ` into the kernel
+  (`=y`). Then the firmware answers: two policies, 355 MHz - 3.42 GHz (CPUs 0-5) and 355 MHz - 4.03 GHz (CPUs 6-11),
+  driver `scmi`, governor `ondemand`. Works after s2idle resume too. Build steps: [cpufreq/README.md](../cpufreq/README.md).
+
 ## ACPI mode: kernel log flood
 
 Not a device tree issue, but it affects the normal (ACPI) boot of the same install.
@@ -161,9 +173,6 @@ Not a device tree issue, but it affects the normal (ACPI) boot of the same insta
 
 ## Still open
 
-- **CPU frequency:** `scmi_cpufreq` gets no answer from the firmware for SCMI performance requests (protocol 0x13,
-  timeout, -110), even when loaded early. ACPI has no CPU performance control either. The CPUs run at the clock
-  UEFI set.
 - **RTC:** `rtc-pm8xxx` reads its offset from the UEFI variable `RTCInfo`, which this laptop does not have, so
   probe failed with -2. Without `qcom,uefi-rtc-info` (Konrad Dybcio's suggestion) the driver probes and `rtc0`
   is read-only, but it reads the raw PMIC counter (~190 days after 1970 on this laptop), not the real time.

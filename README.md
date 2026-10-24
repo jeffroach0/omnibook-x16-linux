@@ -31,7 +31,7 @@ hardware does not work. With this DT, nearly everything does.
 | Suspend (s2idle) | ✅ with a sleep hook | deep sleep is refused by the firmware |
 | Headphone jack | ❌ | Qualcomm SoundWire SDCA codec, no Linux driver |
 | DisplayPort over USB-C | ✅ up to 1080p60 (stock) / ✅ HBR2 with patches | both ports. Stock 7.3 PHY driver: the DTS caps the link at HBR, because HBR2 runs at half rate. With Qualcomm's Glymur DP PHY series (v5) HBR2 works on both ports; occasional no-picture or hub USB 3 drops seen. See [findings](docs/findings.md#displayport-over-usb-c) |
-| CPU frequency scaling | ❌ | firmware does not answer SCMI performance requests; CPUs stay at the clock UEFI set (~3.5 / 3.9 GHz) |
+| CPU frequency scaling | ✅ with a rebuilt kernel | needs `CONFIG_QCOM_CPUCP_MBOX=y` + `CONFIG_ARM_SCMI_CPUFREQ=y` (Ubuntu builds them as modules, which load too late). 355 MHz - 3.42 / 4.03 GHz. See [cpufreq/README.md](cpufreq/README.md) |
 | Real-time clock | ❌ | `rtc0` registers, but reads a raw counter (1970), not real time. The time is correct once NTP syncs. |
 
 ## Repository layout
@@ -43,6 +43,7 @@ hardware does not work. With this DT, nearly everything does.
 | `audio/ucm/` | ALSA UCM profile for the two speakers and the microphones |
 | `audio/wireplumber/` | Fixes the stereo channel order of the speakers |
 | `gpu/` | Mahua GPU kernel patches + build steps, or a Mesa workaround (environment variables, Chrome launcher) |
+| `cpufreq/` | How to rebuild only the kernel image with the CPU frequency drivers built in |
 | `display/` | Local msm patch for the occasional black screen on wake (eDP link training) |
 | `acpi-mode/` | Stops a kernel log flood in the normal ACPI boot (broken ACPI clock driver `acpi_tad`) |
 | `suspend/omnibook-x16-dt` | systemd sleep hook that makes suspend work |
