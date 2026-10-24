@@ -7,7 +7,12 @@ hardware does not work. With this DT, nearly everything does.
 
 > **Status: experimental.** It was tested on one laptop (October 2026),
 > booted as a one-time test entry next to the normal boot entry. It is not
-> upstream. Use it at your own risk, and keep your normal boot entry.
+> upstream yet. Use it at your own risk, and keep your normal boot entry.
+>
+> **Upstream submission:** a cleaned-up version of this DT was sent to the
+> kernel mailing lists on Oct 23, 2026 as
+> [[PATCH 0/2] arm64: dts: qcom: Add HP OmniBook X 16-cp1](https://lore.kernel.org/linux-arm-msm/?q=s%3A%22Add+HP+OmniBook+X+16-cp1%22)
+> (under review, not merged). It has the GPU disabled and no test-only workarounds.
 
 ## What works
 
