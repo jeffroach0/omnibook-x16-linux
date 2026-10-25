@@ -45,13 +45,21 @@ Tested with Howdy `master` at commit `d3ab993` (June 22, 2025), Python 3.14, dli
        sudo python3 -m venv --system-site-packages /opt/howdy-venv
        sudo /opt/howdy-venv/bin/pip install dlib
 
-3. Build Howdy. The interpreter path is compiled into the PAM module, so the venv must exist first.
-   Set the IR camera in the config before installing (use the stable `by-path` name;
-   check yours with `ls -l /dev/v4l/by-path/`, it is the `...:1.2-video-index0` link to `video2` here):
+3. Give the IR camera a fixed name. Do not use `/dev/v4l/by-path/...`: on this laptop the USB
+   controller numbers in those names (`xhci-hcd.N`) change from boot to boot, and Howdy then cannot find
+   the camera. The IR camera also has no `/dev/v4l/by-id/` link. The udev rule
+   [`99-omnibook-ir-camera.rules`](99-omnibook-ir-camera.rules) matches the camera by name and creates
+   `/dev/ir-camera`:
+
+       sudo cp 99-omnibook-ir-camera.rules /etc/udev/rules.d/
+       sudo udevadm control --reload && sudo udevadm trigger --subsystem-match=video4linux
+       ls -l /dev/ir-camera     # -> video2
+
+4. Build Howdy. The interpreter path is compiled into the PAM module, so the venv must exist first.
+   Set the camera in the config before installing:
 
        git clone https://github.com/boltgolt/howdy.git && cd howdy
-       sed -i 's#^device_path = none#device_path = /dev/v4l/by-path/platform-xhci-hcd.3.auto-usb-0:1:1.2-video-index0#' \
-         howdy/src/config.ini
+       sed -i 's#^device_path = none#device_path = /dev/ir-camera#' howdy/src/config.ini
        meson setup build -Dpython_path=/opt/howdy-venv/bin/python3
        meson compile -C build
        sudo meson install -C build --no-rebuild
@@ -60,11 +68,11 @@ Tested with Howdy `master` at commit `d3ab993` (June 22, 2025), Python 3.14, dli
    config: `/usr/local/etc/howdy/config.ini`). `install_pam_config` is off by default, so nothing in
    `/etc/pam.d` changes yet.
 
-4. Download the dlib models. The script saves into the current directory:
+5. Download the dlib models. The script saves into the current directory:
 
        cd /usr/local/share/dlib-data && sudo ./install.sh
 
-5. Add your face and test the same check PAM will run (exit code 0 = recognised, 11 = timeout):
+6. Add your face and test the same check PAM will run (exit code 0 = recognised, 11 = timeout):
 
        sudo howdy add
        sudo /opt/howdy-venv/bin/python3 /usr/local/lib/aarch64-linux-gnu/howdy/compare.py $USER; echo $?
@@ -97,8 +105,8 @@ screen with Super+L.
 - The journal shows `pam_howdy: Failed to read files from glob: 3` at every attempt in DT mode. Howdy
   looks for the lid state in `/proc/acpi/button/lid/*/state`, which does not exist without ACPI. It is
   harmless (the `abort_if_lid_closed` option just cannot work).
-- In the normal ACPI boot the camera path may differ; Howdy then warns that the device is missing and
-  falls back to the password.
+- If Howdy cannot open the camera (for example in the normal ACPI boot, if the camera is missing there), it logs
+  "could not find a camera device" and falls back to the password.
 - `sudo howdy test` opens an OpenCV window, which usually fails under `sudo` on Wayland. The
   `compare.py` command above tests the same thing.
 
@@ -108,3 +116,4 @@ screen with Super+L.
     sudo cp <backup>/gdm-password /etc/pam.d/gdm-password
     cd howdy && sudo ninja -C build uninstall
     sudo rm -rf /opt/howdy-venv /usr/local/share/dlib-data /usr/local/etc/howdy
+    sudo rm /etc/udev/rules.d/99-omnibook-ir-camera.rules

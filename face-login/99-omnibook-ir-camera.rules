@@ -1,0 +1,1 @@
+SUBSYSTEM=="video4linux", ATTR{name}=="HP True Vision FHD Camera: HP I*", ATTR{index}=="0", SYMLINK+="ir-camera"
