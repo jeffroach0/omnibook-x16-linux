@@ -41,9 +41,16 @@ versions as the stock kernel (here gcc 15.3, rustc 1.97.1, bindgen 0.72.1, pahol
 every `vmlinux` line in `build/Module.symvers` should be identical to the `vmlinux` lines in
 `/usr/src/linux-headers-7.3.0-21-qcom-x1e/Module.symvers`.
 
-Install `build/arch/arm64/boot/vmlinuz.efi` as a separate file (for example
-`/boot/vmlinuz-7.3.0-21-qcom-x1e-cpucp`) and add a GRUB entry for it next to the stock one; keep
-the stock kernel and entry as a fallback. The kernel is unsigned: this only works with Secure Boot
+Install `build/arch/arm64/boot/vmlinuz.efi` as a separate file in its own directory (for example
+`/boot/omnibook-dt/vmlinuz-7.3.0-21-qcom-x1e-cpucp`) and add a GRUB entry for it in `/etc/grub.d/40_custom`;
+keep the stock kernel and entry as a fallback.
+
+Do **not** put it directly in `/boot` as `/boot/vmlinuz-*`. Ubuntu's `/etc/grub.d/10_linux` picks up every
+`/boot/vmlinuz-*`, and `7.3.0-21-qcom-x1e-cpucp` sorts above `7.3.0-21-qcom-x1e`, so the next `update-grub`
+makes it the default "Ubuntu" entry. That entry has no initrd (there is no `initrd.img-...-cpucp`), so the normal
+boot panics with `VFS: Unable to mount root fs on unknown-block(0,0)`. For the same reason, don't name a
+directory or file in `/boot` `dtb` or `dtb-<kernel version>`: `10_linux` adds it as a `devicetree` line to the
+ACPI entry (GRUB then reports `error: not a regular file` if it is a directory). The kernel is unsigned: this only works with Secure Boot
 off, and stock modules then log "signature and/or required key missing - tainting kernel" (harmless).
 
 ## Result

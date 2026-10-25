@@ -79,6 +79,10 @@ Tested with Howdy `master` at commit `d3ab993` (June 22, 2025), Python 3.14, dli
 
    Run it once while looking away too: it must not return 0.
 
+   Add several models (`sudo howdy add` again, each with its own label): in daylight and in a dark room,
+   looking at the camera and at the middle of the screen. Sunlight contains infrared, so a single model
+   recorded at night can fail in daytime (match distance 4-5 against the 3.5 limit, exit code 11).
+
 ## Enable it
 
 Back up `/etc/pam.d` and keep a root shell (`sudo -i`) open in another terminal while testing.

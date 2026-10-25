@@ -93,6 +93,10 @@ and run `sudo update-grub`. The important kernel arguments are:
 - `stubble.dtb_override=false` stops Ubuntu's stub from replacing it.
 - `clk_ignore_unused pd_ignore_unused` keep clocks and power domains the firmware turned on.
 
+Keep your DT files in a subdirectory such as `/boot/dtb-test/`. Don't add extra `/boot/vmlinuz-*` kernels or a
+`/boot/dtb` file or directory: Ubuntu's `10_linux` picks them up and can break the normal (ACPI) entry
+(see [cpufreq/README.md](cpufreq/README.md)).
+
 Boot it **once** with `sudo grub-reboot '<entry name>'` and `sudo reboot`. If anything goes wrong, hold the power
 button for about 10 seconds; the next boot uses your normal entry again.
 
