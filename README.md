@@ -30,6 +30,7 @@ hardware does not work. With this DT, nearly everything does.
 | USB-A port (right side), USB 3 + USB 2 | ✅ | |
 | Battery status | ✅ | |
 | Webcam (HP True Vision FHD, RGB + IR) | ✅ | |
+| Face login (IR camera) | ✅ with Howdy | Howdy 3.0 built from source; `sudo`, lock screen and login screen tested. See [face-login/README.md](face-login/README.md) |
 | Speakers (2, stereo) | ✅ | needs UCM + WirePlumber files, see [Audio](#audio) |
 | Built-in microphones | ✅ | |
 | Audio over DisplayPort/HDMI (both USB-C ports) | ✅ | uses the X1E80100 CRD audio topology + UCM file, see [audio/README.md](audio/README.md) |
@@ -52,6 +53,7 @@ hardware does not work. With this DT, nearly everything does.
 | `cpufreq/` | How to rebuild only the kernel image with the CPU frequency drivers built in |
 | `display/` | Local msm patch for the occasional black screen on wake (eDP link training) |
 | `acpi-mode/` | Stops a kernel log flood in the normal ACPI boot (broken ACPI clock driver `acpi_tad`) |
+| `face-login/` | Face login with the IR camera (Howdy 3.0 from source) |
 | `suspend/omnibook-x16-dt` | systemd sleep hook that makes suspend work |
 | `grub/40_custom.example` | Example one-shot GRUB test entry |
 | `docs/findings.md` | What was found and how each problem was fixed |
@@ -129,6 +131,7 @@ back to `board.bin`. The right data is inside Windows' `bdwlan_qcc2072_1p0_ncm82
   `mahua.dtsi` before building the DTB), or add the lines from `gpu/environment-additions` to `/etc/environment`.
 - **Suspend:** `sudo install -m 755 suspend/omnibook-x16-dt /usr/lib/systemd/system-sleep/`.
   The hook does nothing when you are not booted with this DT.
+- **Face login:** see [face-login/README.md](face-login/README.md).
 
 ## GPU
 
