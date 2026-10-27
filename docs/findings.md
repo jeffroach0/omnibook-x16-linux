@@ -113,6 +113,8 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
   `/sys/bus/thunderbolt/devices` is empty, and Linux has no Qualcomm USB4 host-router driver yet anyway. A display
   or dock that only works over Thunderbolt will not work; one that accepts DP Alt Mode over USB-C does. (The ACPI
   device named `USB4` is the webcam's USB 2 controller, not USB4.)
+  HP's Maintenance and Service Guide for this series (16-cp0xxx/16-cp1xxx) agrees: both USB-C ports are listed
+  as "USB Type-C 10 Gbps" ([PDF](https://kaas.hpcloud.hp.com/pdf-public/pdf_13599387_en-US-1.pdf)).
 
 ## Wi-Fi
 
