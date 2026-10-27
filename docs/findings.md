@@ -192,6 +192,18 @@ Not a device tree issue, but it affects the normal (ACPI) boot of the same insta
   (enable it) to unload the driver early if an initramfs loaded it anyway. Tested in an ACPI boot: no `PRTC` errors.
   There is no RTC in ACPI mode then; the time comes from NTP. The driver never loads in DT mode.
 
+## PMIC regulator voltages
+
+The regulator voltages in the DTS came from the EliteBook X G2q donor. They were checked against the power votes
+(`PMICVREGVOTE`) in this laptop's ACPI tables, which list the voltage Windows asks for on each rail, per device.
+
+- 13 of the 14 PMIC LDOs match Windows exactly, and so do their consumers (Wi-Fi and NVMe PCIe, USB PHYs).
+- `l1f_e1` was 880 mV (donor). Windows votes 904 mV for PCIe and USB and 880 mV only for UFS and the GPU, so the rail
+  runs at 904 mV. Changed to 904 mV (label `vreg_l1f_e1_0p9`). Tested on Oct 27: Wi-Fi, NVMe, suspend, USB-A and both
+  USB-C ports at SuperSpeed in both orientations, a USB-C hub with an external monitor.
+- `l1b_e0` (1.8 V, microphone bias) is not in the ACPI votes because Windows manages the audio rails from the audio
+  DSP. All Glymur laptops use 1.8 V.
+
 ## Still open
 
 - **RTC:** `rtc-pm8xxx` reads its offset from the UEFI variable `RTCInfo`, which this laptop does not have, so

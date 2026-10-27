@@ -454,10 +454,14 @@
 		compatible = "qcom,pmh0110-rpmh-regulators";
 		qcom,pmic-id = "F_E1";
 
-		vreg_l1f_e1_0p88: ldo1 {
-			regulator-name = "vreg_l1f_e1_0p88";
-			regulator-min-microvolt = <880000>;
-			regulator-max-microvolt = <880000>;
+		/*
+		 * VERIFIED (Oct 27): DSDT PEP votes 904 mV for PCI4/USB2/USB3/USB4
+		 * (880 mV only for UFS0/GPU0). The donor used 880 mV.
+		 */
+		vreg_l1f_e1_0p9: ldo1 {
+			regulator-name = "vreg_l1f_e1_0p9";
+			regulator-min-microvolt = <904000>;
+			regulator-max-microvolt = <904000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 		};
 
@@ -832,15 +836,15 @@
 	vdda-qrefrpt0-0p9-supply = <&vreg_l2f_e1_0p88>;
 	vdda-qrefrpt1-0p9-supply = <&vreg_l2f_e1_0p88>;
 	vdda-qrefrpt2-0p9-supply = <&vreg_l2f_e1_0p88>;
-	vdda-qrefrpt3-0p9-supply = <&vreg_l1f_e1_0p88>;
+	vdda-qrefrpt3-0p9-supply = <&vreg_l1f_e1_0p9>;
 	vdda-qrefrpt4-0p9-supply = <&vreg_l2h_e0_0p88>;
 	vdda-qrefrpt5-0p9-supply = <&vreg_l2h_e0_0p88>;
 	vdda-qrefrx0-0p9-supply = <&vreg_l2f_e1_0p88>;
 	vdda-qrefrx1-0p9-supply = <&vreg_l2f_e1_0p88>;
 	vdda-qrefrx2-0p9-supply = <&vreg_l2f_e1_0p88>;
 	vdda-qrefrx3-0p9-supply = <&vreg_l2h_e0_0p88>;
-	vdda-qreftx1-0p9-supply = <&vreg_l1f_e1_0p88>;
-	vdda-refgen3-0p9-supply = <&vreg_l1f_e1_0p88>;
+	vdda-qreftx1-0p9-supply = <&vreg_l1f_e1_0p9>;
+	vdda-refgen3-0p9-supply = <&vreg_l1f_e1_0p9>;
 	vdda-refgen3-1p2-supply = <&vreg_l4f_e1_1p2>;
 };
 
