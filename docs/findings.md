@@ -107,6 +107,12 @@ rendered on it, and the screen was badly corrupted (blocks, diagonal half-screen
   both work. Also confirmed on the everyday DT boot, including a mouse plugged in after boot.
   (Found by the Sashiko review bot on the upstream patch.)
 - Webcam: on the internal USB 2 controller `usb_hs` (HP True Vision FHD, `30c9:00d9`, RGB + IR).
+- **No USB4 / Thunderbolt on this model, in Windows either.** The SoC has a USB4 host router, and the ACPI tables
+  describe it (`\_SB.UBF0`, `QCOM0C6D`, ports with `_CID ACPI0015`), but its `_STA` always returns 0, so the
+  firmware disables it. The USB-C ports are USB 3 (10 Gbps) with DisplayPort Alt Mode. In DT mode
+  `/sys/bus/thunderbolt/devices` is empty, and Linux has no Qualcomm USB4 host-router driver yet anyway. A display
+  or dock that only works over Thunderbolt will not work; one that accepts DP Alt Mode over USB-C does. (The ACPI
+  device named `USB4` is the webcam's USB 2 controller, not USB4.)
 
 ## Wi-Fi
 
