@@ -35,7 +35,7 @@ hardware does not work. With this DT, nearly everything does.
 | Built-in microphones | ✅ | |
 | Audio over DisplayPort/HDMI (both USB-C ports) | ✅ | uses the X1E80100 CRD audio topology + UCM file, see [audio/README.md](audio/README.md) |
 | Audio DSP / compute DSP (ADSP, CDSP) | ✅ | firmware from Windows |
-| Suspend (s2idle) | ✅ with a sleep hook | deep sleep is refused by the firmware |
+| Suspend (s2idle) | ✅ with a sleep hook | deep sleep is refused by the firmware. Drains about 1.2-1.3 W (~2%/h): the SoC never reaches its deepest sleep states, see [findings](docs/findings.md#suspend) |
 | Headphone jack | ❌ | Qualcomm SoundWire SDCA codec, no Linux driver |
 | DisplayPort over USB-C | ✅ up to 1080p60 (stock) / ✅ HBR2 with patches | both ports. Stock 7.3 PHY driver: the DTS caps the link at HBR, because HBR2 runs at half rate. With Qualcomm's Glymur DP PHY series (v5) HBR2 works on both ports; occasional no-picture or hub USB 3 drops seen. See [findings](docs/findings.md#displayport-over-usb-c) |
 | CPU frequency scaling | ✅ with a rebuilt kernel | needs `CONFIG_QCOM_CPUCP_MBOX=y` + `CONFIG_ARM_SCMI_CPUFREQ=y` (Ubuntu builds them as modules, which load too late). 355 MHz - 3.42 / 4.03 GHz. See [cpufreq/README.md](cpufreq/README.md) |

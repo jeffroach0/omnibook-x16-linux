@@ -176,6 +176,19 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   Built as an out-of-tree `gcc-glymur.ko`, the webcam survives resume without the unbind (tested several times).
 - `suspend/omnibook-x16-dt` sets s2idle and disables the Wi-Fi wakeup. It unbinds the webcam controller only when
   the patched `gcc-glymur` is not loaded (it compares the module's `srcversion`; set yours in the script).
+- **Battery drain in suspend: about 1.2-1.3 W** (about 2% of the battery per hour), measured Oct 30 with the
+  battery gauge reading `energy_now`. The SoC never reaches its deep sleep states: in `/sys/kernel/debug/qcom_stats`
+  the `cxsd`, `aosd` and `ddr` counts stay 0 across suspends, while `apss`, `adsp`, `cdsp` and `soccp` do sleep.
+  Things ruled out, one test each (10-15 min s2idle):
+  - The CPU side: `power-domain-system` (PSCI `0x0200c354`) is entered in s2idle (its `S2idle` count in
+    `/sys/kernel/debug/pm_genpd/power-domain-system/idle_states` goes up).
+  - Pending `sync_state()` (the interconnects and `gcc`/`gpucc` wait for the crypto engine and the GMU, which never
+    get a driver): forcing it with `fw_devlink.sync_state=timeout` changed nothing.
+  - NVMe and Wi-Fi PCIe: both links go down in suspend (the NVMe is reset on every resume).
+  - USB: unbinding all four `dwc3-qcom` controllers before suspend changed nothing.
+  Left: GPU/GMU, display, and firmware votes. Owners of the earlier Snapdragon X1 laptops report the same symptom
+  ([example](https://github.com/jglathe/linux_ms_dev_kit/issues/94)), so this looks like a gap in Linux support for
+  these SoCs, not something in this DTS. Parked until newer kernels.
 
 ## CPU frequency scaling
 
@@ -220,6 +233,7 @@ The regulator voltages in the DTS came from the EliteBook X G2q donor. They were
   Where Windows keeps the real offset is unknown. The time is fine once NTP syncs.
 - **Headphone jack:** no Linux driver for the Qualcomm SDCA codec.
 - **DisplayPort over USB-C above HBR:** see [DisplayPort over USB-C](#displayport-over-usb-c).
+- **Suspend drain (~1.2-1.3 W):** the SoC never reaches its deep sleep states, see [Suspend](#suspend).
 
 ## Things that are easy to get wrong
 
