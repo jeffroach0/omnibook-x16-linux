@@ -1,0 +1,4 @@
+# HP OmniBook X16, DT mode: HP EC (mute/mic-mute LEDs) at 0x76 on QUP i2c a84000 (&i2c9).
+# Stable name /dev/omnibook-ec (bus number changes per boot) + access for the logged-in user
+# (uaccess must be set before 73-seat-late.rules, hence 70-).
+SUBSYSTEM=="i2c-dev", KERNELS=="a84000.i2c", SYMLINK+="omnibook-ec", TAG+="uaccess"

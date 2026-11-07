@@ -1,0 +1,13 @@
+[Unit]
+Description=HP OmniBook X16 mute/mic-mute key LEDs (DT mode, HP EC on i2c9)
+ConditionPathExists=/dev/omnibook-ec
+After=pipewire.service wireplumber.service
+Wants=wireplumber.service
+
+[Service]
+ExecStart=%h/.local/bin/omnibook-ec-leds
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

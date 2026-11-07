@@ -677,6 +677,20 @@
 	};
 };
 
+/*
+ * HP embedded controller bus. VERIFIED from ACPI: \_SB.IC10 ("QUP_1_SE_1",
+ * MMIO 0xa84000) carries the HP EC at address 0x76, 400 kHz (ssdt3). HP's
+ * mute / mic-mute key LEDs are EC mailbox commands (ssdt3 \_SB.HQEX and
+ * \_SB.WMID.SMLS). VERIFIED Nov 6: both LEDs switch. No child node: the EC
+ * is driven from user space via i2c-dev, see keyboard-leds/. It is NOT the
+ * Qualcomm reference EC protocol (qcom-hamoa-ec), so do not bind that driver.
+ */
+&i2c9 {
+	clock-frequency = <400000>;
+
+	status = "okay";
+};
+
 /* Built-in digital mics on DMIC0/1 (DONOR) */
 &lpass_vamacro {
 	vdd-micb-supply = <&vreg_l1b_e0_1p8>;

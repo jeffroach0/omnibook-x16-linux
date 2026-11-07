@@ -1,0 +1,16 @@
+[Unit]
+Description=HP OmniBook X16 mic-mute key (keyboard usage 0x8000 -> KEY_MICMUTE)
+# DT mode only (in ACPI mode /proc/device-tree does not exist)
+ConditionPathExists=/proc/device-tree/model
+
+[Service]
+ExecStart=/usr/local/sbin/omnibook-micmute-key
+Restart=on-failure
+RestartSec=3
+ProtectSystem=strict
+ProtectHome=yes
+PrivateNetwork=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

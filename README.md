@@ -23,6 +23,7 @@ hardware does not work. With this DT, nearly everything does.
 | Brightness (keys + slider) | ✅ | DP-AUX backlight |
 | GPU (Adreno X2-85, hardware rendering) | ✅ with patches | needs a patched `msm.ko` (Qualcomm's Mahua GPU series), or a Mesa workaround; see [GPU](#gpu) |
 | Keyboard, touchpad, lid switch, power key | ✅ | |
+| Mute / mic-mute key LEDs, mic-mute key | ✅ with a small service | LEDs are driven by HP's embedded controller; the mic-mute key sends a code the kernel drops. See [keyboard-leds/README.md](keyboard-leds/README.md) |
 | Touchscreen (ELAN, I2C) | ✅ | `i2c8`, address 0x10, interrupt GPIO 51 (from the DSDT) |
 | Wi-Fi (Qualcomm QCC2072, Wi-Fi 7) | ✅ | needs a board file from Windows, see [Wi-Fi](#wi-fi) |
 | Bluetooth (QCC2072) | ⚠️ works with patched modules | not in kernel 7.3, see [Bluetooth](#bluetooth). Pairing, audio and earbud mic tested |
@@ -54,6 +55,7 @@ hardware does not work. With this DT, nearly everything does.
 | `display/` | Local msm patch for the occasional black screen on wake (eDP link training) |
 | `acpi-mode/` | Stops a kernel log flood in the normal ACPI boot (broken ACPI clock driver `acpi_tad`) |
 | `face-login/` | Face login with the IR camera (Howdy 3.0 from source) |
+| `keyboard-leds/` | Mute / mic-mute LEDs (HP EC over I2C, synced with PipeWire) and a fix for the mic-mute key |
 | `suspend/omnibook-x16-dt` | systemd sleep hook that makes suspend work |
 | `grub/40_custom.example` | Example one-shot GRUB test entry |
 | `docs/findings.md` | What was found and how each problem was fixed |

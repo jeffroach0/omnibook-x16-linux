@@ -190,6 +190,16 @@ linux-firmware's generic Glymur files are signed differently. The DT points `fir
   ([example](https://github.com/jglathe/linux_ms_dev_kit/issues/94)), so this looks like a gap in Linux support for
   these SoCs, not something in this DTS. Parked until newer kernels.
 
+## Keyboard LEDs and the mic-mute key
+
+- The mute / mic-mute LEDs belong to HP's embedded controller, not the keyboard. Windows sets them through ACPI
+  (`\_SB.WMID.SMLS` -> `\_SB.HQEX` in ssdt3): EC at I2C 0x76 on `&i2c9` (0xa84000), a small mailbox
+  (registers 0xED / 0xEE / 0xEF). Enabling `&i2c9` and sending the same commands from user space works.
+- The mic-mute key sends Keyboard-page usage 0x8000. The descriptor declares 0..0x8000 usages, the kernel keeps only
+  12288 (`ignoring exceeding usage max`), so the key is dropped and hwdb cannot remap it. A user-space hidraw ->
+  uinput bridge fixes it. Fn-lock (Fn+Shift) is handled by the EC alone and works without a driver.
+- Details and install steps: [keyboard-leds/README.md](../keyboard-leds/README.md).
+
 ## CPU frequency scaling
 
 - With Ubuntu's kernel, `scmi_cpufreq` gets no answer from the firmware for SCMI performance requests (protocol 0x13):
