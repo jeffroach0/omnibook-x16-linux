@@ -8,7 +8,8 @@ There are two ways to fix it. Use one of them.
 
 ## Option A (recommended): the Mahua GPU patches
 
-Qualcomm's series "drm/msm: Mahua GPU support" v1 (Sept 2026, not merged yet;
+Qualcomm's series "drm/msm: Mahua GPU support" v1 (Sept 2026; patch 5 was applied to the Qualcomm tree for
+kernel 7.5 in Nov 2026, the driver patch 3 is not merged yet;
 [lore](https://lore.kernel.org/all/20260925-mahua-gpu-v1-0-0fa0bfd8d315@oss.qualcomm.com/))
 adds a catalog entry for the Mahua GPU (chip ID 0x44060000, 15.75 MB GMEM, 3 slices).
 Two of its patches are needed here:

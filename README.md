@@ -12,7 +12,8 @@ hardware does not work. With this DT, nearly everything does.
 > **Upstream submission:** a cleaned-up version of this DT was sent to the
 > kernel mailing lists on Oct 23, 2026 as
 > [[PATCH 0/2] arm64: dts: qcom: Add HP OmniBook X 16-cp1](https://lore.kernel.org/linux-arm-msm/?q=s%3A%22Add+HP+OmniBook+X+16-cp1%22)
-> (under review, not merged). It has the GPU disabled and no test-only workarounds.
+> (under review, not merged). The latest version is v4 (Nov 10, 2026), rebased on the Qualcomm tree's
+> shared Glymur/Mahua regulator settings. It has the GPU disabled and no test-only workarounds.
 
 ## What works
 
