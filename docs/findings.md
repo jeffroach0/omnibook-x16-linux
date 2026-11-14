@@ -233,7 +233,7 @@ The regulator voltages in the DTS came from the EliteBook X G2q donor. They were
 - `l1f_e1` was 880 mV (donor). Windows votes 904 mV for PCIe and USB and 880 mV only for UFS and the GPU, so the rail
   runs at 904 mV. Changed to 904 mV (label `vreg_l1f_e1_0p9`). Tested on Oct 27: Wi-Fi, NVMe, suspend, USB-A and both
   USB-C ports at SuperSpeed in both orientations, a USB-C hub with an external monitor.
-- The upstream DTS (v4) uses the shared Glymur/Mahua regulator file that the Qualcomm tree gained in Nov 2026.
+- The upstream DTS (v4 and later) uses the shared Glymur/Mahua regulator file that the Qualcomm tree gained in Nov 2026.
   It sets `l2f0` (`l2f_e0` here) to 944 mV instead of the 936 mV Windows votes. Tested on Nov 10 at 944 mV:
   audio, Wi-Fi, Bluetooth, webcam, USB-A, a USB-C hub with a TV on both ports, suspend. The DTS in this repo keeps 936 mV.
 - `l1b_e0` (1.8 V, microphone bias) is not in the ACPI votes because Windows manages the audio rails from the audio
